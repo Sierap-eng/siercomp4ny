@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel CEO - SierCompany</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>.aba-ativa { border-bottom: 2px solid #0066FF; color: #0066FF; font-weight: bold; } .aba-inativa { color: #666; cursor: pointer; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <div id="telaLogin" class="fixed inset-0 bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+            <h1 class="text-2xl font-bold mb-2 text-gray-800">🔒 Painel CEO</h1>
+            <input type="password" id="senhaInput" placeholder="Senha Mestra" class="w-full p-3 border rounded-lg mb-4 text-center">
+            <button onclick="verificarSenha()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition">ENTRAR</button>
+        </div>
+    </div>
+
+    <div id="painelAdmin" class="hidden">
+        <header class="bg-white border-b sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+                <h1 class="font-bold text-xl text-gray-800">Sier<span class="text-blue-600">Admin</span></h1>
+                <nav class="hidden md:flex gap-6 h-full items-center">
+                    <button onclick="mudarAba('dashboard')" id="tab-dashboard" class="aba-ativa h-full flex items-center gap-2 text-sm">Dashboard</button>
+                    <button onclick="mudarAba('lojas')" id="tab-lojas" class="aba-inativa h-full flex items-center gap-2 text-sm">Lojas</button>
+                    <button onclick="mudarAba('marketing')" id="tab-marketing" class="aba-inativa h-full flex items-center gap-2 text-sm text-purple-600 font-bold">Ads</button>
+                    <button onclick="mudarAba('config')" id="tab-config" class="aba-inativa h-full flex items-center gap-2 text-sm text-orange-600 font-bold">Configuração</button>
+                </nav>
+                <button onclick="location.reload()" class="text-red-500 p-2"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            
+            <div id="view-dashboard" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center">
+                    <div><h3 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i data-lucide="rocket" class="w-5 h-5 text-purple-600"></i> Oferta Upsell</h3><p class="text-xs text-gray-500">Oferecer banner na tela de pagamento PRO?</p></div>
+                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-gray-200 text-gray-500 px-6 py-2 rounded-full font-bold text-xs shadow transition">Carregando...</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100"><p class="text-[10px] text-gray-400 font-bold uppercase">Faturamento</p><h3 class="text-2xl font-bold text-green-600" id="kpi-faturamento">R$ 0,00</h3></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100"><p class="text-[10px] text-gray-400 font-bold uppercase">Lojas</p><h3 class="text-2xl font-bold text-gray-800" id="kpi-lojas">0</h3></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100"><p class="text-[10px] text-gray-400 font-bold uppercase">Assinantes PRO</p><h3 class="text-2xl font-bold text-yellow-600" id="kpi-pro">0</h3></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100"><p class="text-[10px] text-gray-400 font-bold uppercase">Receita Ads</p><h3 class="text-2xl font-bold text-purple-600" id="kpi-ads">R$ 0,00</h3></div>
+                </div>
+            </div>
+
+            <div id="view-lojas" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 font-bold text-gray-700 flex justify-between"><span>Gerenciar Lojas</span><button onclick="carregarTudo()" class="text-blue-600 text-xs">Atualizar</button></div>
+                <div id="listaLojas" class="divide-y divide-gray-100"></div>
+            </div>
+
+            <div id="view-marketing" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
+                    <div class="p-4 bg-orange-50 font-bold text-orange-800 flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Pedidos Pendentes</div>
+                    <div id="listaPendentes" class="divide-y divide-orange-100"></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 bg-gray-50 font-bold text-gray-700">Banners no Ar</div>
+                    <div id="listaAtivos" class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4"></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-100">
+                    <h3 class="font-bold text-gray-500 text-sm mb-2 flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Upload Manual</h3>
+                    <div class="flex flex-col md:flex-row gap-2 items-end">
+                        <div class="w-full"><label class="text-[10px] font-bold text-gray-400">IMAGEM</label><input type="file" id="bannerFile" class="text-xs w-full bg-gray-50 p-2 rounded border"></div>
+                        <div class="w-full"><label class="text-[10px] font-bold text-gray-400">LINK</label><input type="text" id="bannerLink" placeholder="https://..." class="text-xs w-full p-2 rounded border"></div>
+                        <div class="w-32"><label class="text-[10px] font-bold text-gray-400">DIAS</label><input type="number" id="manualDias" value="30" class="text-xs w-full p-2 rounded border text-center font-bold"></div>
+                        <button onclick="uploadManual()" class="bg-gray-800 text-white px-6 py-2 rounded text-xs font-bold h-[34px]">ENVIAR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-config" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="dollar-sign" class="w-5 h-5 text-green-600"></i> Tabela de Preços</h3>
+                    <p class="text-sm text-gray-500 mb-6">Altere os valores cobrados no site. O QR Code atualiza automaticamente.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Plano PRO (Mensal)</label>
+                            <div class="flex items-center"><span class="text-gray-500 mr-2">R$</span><input type="number" step="0.01" id="price_pro" class="text-xl font-bold text-gray-900 bg-transparent border-b border-gray-300 w-full focus:outline-none focus:border-blue-500"></div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Banner 7 Dias</label>
+                            <div class="flex items-center"><span class="text-gray-500 mr-2">R$</span><input type="number" step="0.01" id="price_7d" class="text-xl font-bold text-gray-900 bg-transparent border-b border-gray-300 w-full focus:outline-none focus:border-blue-500"></div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Banner 14 Dias</label>
+                            <div class="flex items-center"><span class="text-gray-500 mr-2">R$</span><input type="number" step="0.01" id="price_14d" class="text-xl font-bold text-gray-900 bg-transparent border-b border-gray-300 w-full focus:outline-none focus:border-blue-500"></div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Banner 30 Dias</label>
+                            <div class="flex items-center"><span class="text-gray-500 mr-2">R$</span><input type="number" step="0.01" id="price_30d" class="text-xl font-bold text-gray-900 bg-transparent border-b border-gray-300 w-full focus:outline-none focus:border-blue-500"></div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="salvarPrecos()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow transition">SALVAR NOVOS PREÇOS</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const SENHA_MESTRA = "sier2026";
+        
+        // ⚠️ COLE SUAS CHAVES AQUI
+        const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
+        const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
+        let client = null;
+        try { client = supabase.createClient(URL_API, KEY_API); } catch(e){}
+
+        let dadosLojas=[], dadosBanners=[], upsellAtivo=true;
+
+        function verificarSenha() {
+            if(document.getElementById('senhaInput').value === SENHA_MESTRA) {
+                document.getElementById('telaLogin').classList.add('hidden');
+                document.getElementById('painelAdmin').classList.remove('hidden');
+                carregarTudo();
+            } else { alert("Senha incorreta"); }
+        }
+
+        window.mudarAba = (aba) => {
+            ['dashboard','lojas','marketing','config'].forEach(n => {
+                const el = document.getElementById(`view-${n}`); if(el) el.classList.add('hidden');
+                const tab = document.getElementById(`tab-${n}`); 
+                if(tab) tab.className = 'aba-inativa h-full flex items-center gap-2 text-sm';
+            });
+            document.getElementById(`view-${aba}`).classList.remove('hidden');
+            const color = aba==='marketing'?'text-purple-600':(aba==='config'?'text-orange-600':'text-blue-600');
+            document.getElementById(`tab-${aba}`).className = `aba-ativa h-full flex items-center gap-2 text-sm ${color} font-bold`;
+        }
+
+        async function carregarTudo() {
+            // Upsell
+            const { data: up } = await client.from('config').select('ativo').eq('chave', 'upsell_banner').single();
+            if(up) { upsellAtivo = up.ativo; renderBtnUpsell(); }
+
+            // Preços
+            const { data: precos } = await client.from('precos').select('*');
+            if(precos) {
+                precos.forEach(p => {
+                    if(p.chave === 'plano_pro') document.getElementById('price_pro').value = p.valor;
+                    if(p.chave === 'banner_7d') document.getElementById('price_7d').value = p.valor;
+                    if(p.chave === 'banner_14d') document.getElementById('price_14d').value = p.valor;
+                    if(p.chave === 'banner_30d') document.getElementById('price_30d').value = p.valor;
+                });
+            }
+
+            // Lojas e Banners
+            const { data: lojas } = await client.from('lojas').select('*').order('created_at', {ascending:false});
+            dadosLojas = lojas || [];
+            const { data: banners } = await client.from('banners').select('*').order('created_at', {ascending:false});
+            dadosBanners = banners || [];
+            
+            atualizarDashboard(); renderMarketing(); renderLojas();
+        }
+
+        async function salvarPrecos() {
+            const updates = [
+                { chave: 'plano_pro', valor: document.getElementById('price_pro').value },
+                { chave: 'banner_7d', valor: document.getElementById('price_7d').value },
+                { chave: 'banner_14d', valor: document.getElementById('price_14d').value },
+                { chave: 'banner_30d', valor: document.getElementById('price_30d').value }
+            ];
+
+            for (const item of updates) {
+                await client.from('precos').upsert(item);
+            }
+            alert("Preços atualizados com sucesso!");
+        }
+
+        // Funções de UI Upsell
+        function renderBtnUpsell() {
+            const btn = document.getElementById('btnUpsell');
+            if(upsellAtivo) { btn.innerText="ATIVADO"; btn.className="bg-green-500 text-white px-6 py-2 rounded-full font-bold text-xs shadow"; }
+            else { btn.innerText="DESATIVADO"; btn.className="bg-red-500 text-white px-6 py-2 rounded-full font-bold text-xs shadow"; }
+        }
+        async function toggleUpsell() {
+            upsellAtivo = !upsellAtivo;
+            await client.from('config').upsert({ chave: 'upsell_banner', ativo: upsellAtivo });
+            renderBtnUpsell();
+        }
+
+        // Dashboard e Listas (Código igual ao anterior, resumido aqui)
+        function actualizarDashboard() {
+            const pros = dadosLojas.filter(l => l.plano === 'pro');
+            const fatLojas = pros.length * document.getElementById('price_pro').value; // Estimativa baseada no preço atual
+            const fatAds = dadosBanners.filter(b => b.status === 'ativo').length * 50; // Estimativa
+            
+            document.getElementById('kpi-lojas').innerText = dadosLojas.length;
+            document.getElementById('kpi-pro').innerText = pros.length;
+            document.getElementById('kpi-ads').innerText = "R$ ..."; // Simplificado
+            document.getElementById('kpi-faturamento').innerText = "R$ ..."; 
+        }
+
+        function renderMarketing() {
+            const pendentes = dadosBanners.filter(b => b.status === 'pendente');
+            const divPen = document.getElementById('listaPendentes');
+            if(pendentes.length===0) divPen.innerHTML = '<p class="p-4 text-sm text-gray-400">Nenhum pedido.</p>';
+            else divPen.innerHTML = pendentes.map(b => `<div class="p-4 flex gap-4 bg-white"><img src="${b.imagem_url}" class="w-16 h-8 object-cover rounded"><div class="flex-1"><p class="font-bold text-sm">${b.nome_cliente}</p></div><button onclick="aprovarBanner('${b.id}', ${b.plano_dias})" class="text-green-600 font-bold text-xs">APROVAR</button><button onclick="deletarBanner('${b.id}')" class="text-red-500 text-xs">X</button></div>`).join('');
+            
+            const ativos = dadosBanners.filter(b => b.status === 'ativo');
+            document.getElementById('listaAtivos').innerHTML = ativos.map(b => `<div class="border rounded p-2"><img src="${b.imagem_url}" class="w-full h-20 object-cover rounded"><p class="text-xs font-bold mt-1">${b.nome_cliente}</p><button onclick="deletarBanner('${b.id}')" class="text-red-500 text-[10px]">Remover</button></div>`).join('');
+        }
+
+        async function uploadManual() {
+            const file = document.getElementById('bannerFile').files[0];
+            if(!file) return alert("Selecione imagem!");
+            const nome = `manual_${Date.now()}.jpg`;
+            const { error } = await client.storage.from('sier-images').upload(nome, file);
+            if(error) return alert("Erro");
+            const { data } = client.storage.from('sier-images').getPublicUrl(nome);
+            await client.from('banners').insert([{ imagem_url: data.publicUrl, link_destino: document.getElementById('bannerLink').value, status: 'ativo', nome_cliente: 'Manual', plano_dias: document.getElementById('manualDias').value }]);
+            alert("Sucesso"); carregarTudo();
+        }
+
+        async function aprovarBanner(id, dias) { await client.from('banners').update({ status: 'ativo' }).eq('id', id); carregarTudo(); }
+        async function deletarBanner(id) { if(confirm('Excluir?')) await client.from('banners').delete().eq('id', id); carregarTudo(); }
+        
+        function renderLojas() {
+            document.getElementById('listaLojas').innerHTML = dadosLojas.map(l => `<div class="p-4 flex justify-between bg-white border-b"><p class="font-bold text-sm">${l.nome_fantasia}</p><div class="flex gap-2"><button onclick="mudarPlano('${l.id}','${l.plano==='pro'?'gratis':'pro'}')" class="text-blue-600 text-xs">Mudar Plano</button><button onclick="apagarLoja('${l.id}')" class="text-red-600 text-xs">Excluir</button></div></div>`).join('');
+        }
+        async function mudarPlano(id, novo) { await client.from('lojas').update({plano:novo}).eq('id',id); carregarTudo(); }
+        async function apagarLoja(id) { if(confirm('Apagar?')) await client.from('lojas').delete().eq('id',id); carregarTudo(); }
+    </script>
+</body>
+</html>  
+
+       

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro SierCompany</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        .modal-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; text-align: center; }
+        .crop-container { max-height: 50vh; overflow: hidden; margin-top: 10px; background: #000; }
+        .bloqueado { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-10 px-4">
+
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-lg p-8">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Cadastrar Loja</h1>
+
+        <form id="formCadastro" class="space-y-4">
+            
+            <div class="space-y-2">
+                <label class="font-bold text-sm text-gray-600">Dados da Empresa</label>
+                <input type="text" id="documento" required placeholder="CPF ou CNPJ (Somente números) *" class="w-full p-3 border rounded-lg bg-gray-50 font-mono">
+                <input type="text" id="nome" required placeholder="Nome Fantasia *" class="w-full p-3 border rounded-lg bg-gray-50">
+                <select id="categoria" required class="w-full p-3 border rounded-lg bg-gray-50">
+                    <option value="" disabled selected>Categoria</option>
+                    <option>Alimentação</option><option>Moda</option><option>Serviços</option>
+                    <option>Automotivo</option><option>Saúde</option><option>Decoração</option>
+                </select>
+                <textarea id="descricao" required rows="3" placeholder="Descrição da loja..." class="w-full p-3 border rounded-lg bg-gray-50"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <input type="tel" id="whatsapp" required placeholder="WhatsApp (DDD+Num) *" class="w-full p-3 border rounded-lg bg-gray-50">
+                <input type="text" id="instagram" placeholder="Instagram (sem @)" class="w-full p-3 border rounded-lg bg-gray-50">
+            </div>
+            <input type="text" id="site" placeholder="Site ou Portfólio (http://...)" class="w-full p-3 border rounded-lg bg-gray-50">
+
+            <div class="space-y-2">
+                <label class="font-bold text-sm text-gray-600">Endereço</label>
+                <div class="flex gap-2">
+                    <input type="text" id="cep" placeholder="CEP" class="w-full p-3 border rounded-lg bg-gray-50">
+                    <button type="button" onclick="buscarCep()" class="bg-blue-600 text-white px-4 rounded-lg font-bold">Buscar</button>
+                </div>
+                <input type="text" id="endereco" placeholder="Rua/Bairro" class="w-full p-3 border rounded-lg bg-gray-50">
+                <div class="flex gap-2">
+                    <input type="text" id="cidade" placeholder="Cidade" class="w-full p-3 border rounded-lg bg-gray-50">
+                    <input type="text" id="estado" placeholder="UF" class="w-20 p-3 border rounded-lg bg-gray-50">
+                </div>
+            </div>
+
+            <div class="py-6 border-t border-b border-gray-100 my-4">
+                <label class="font-bold text-sm text-gray-600 mb-3 block">Escolha o Plano</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 p-4 border rounded-xl w-1/2 cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="plano" value="gratis" onchange="mudarPlano('gratis')"> 
+                        <span class="font-medium text-gray-700">Grátis</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-4 border-2 border-yellow-400 bg-yellow-50 rounded-xl w-1/2 cursor-pointer relative">
+                        <input type="radio" name="plano" value="pro" onchange="mudarPlano('pro')" checked> 
+                        <span class="font-bold text-black">PRO ⚡</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="font-bold text-sm text-gray-600">Imagens</label>
+                <button type="button" onclick="document.getElementById('fileCapa').click()" class="w-full block p-6 border-2 border-dashed border-gray-300 rounded-xl text-center bg-gray-50 hover:bg-gray-100 transition">
+                    <i data-lucide="camera" class="w-8 h-8 mx-auto text-gray-400 mb-2"></i>
+                    <p id="txtCapa" class="text-sm text-gray-600 font-bold">Adicionar Capa (Obrigatório)</p>
+                </button>
+                <input type="file" id="fileCapa" accept="image/*" class="hidden" onchange="abrirRecorte(this)">
+                <img id="previewCapa" class="w-full h-40 object-cover rounded-xl hidden border shadow-sm">
+
+                <div id="areaPro" class="p-5 bg-yellow-50 rounded-xl border border-yellow-200 transition-all">
+                    <p class="text-sm font-bold text-yellow-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="images" class="w-4 h-4"></i> Galeria PRO (3 Fotos)
+                    </p>
+                    <div class="space-y-2">
+                        <input type="file" id="foto1" accept="image/*" class="w-full text-xs">
+                        <input type="file" id="foto2" accept="image/*" class="w-full text-xs">
+                        <input type="file" id="foto3" accept="image/*" class="w-full text-xs">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-2 pt-4">
+                <input type="checkbox" id="termos" required class="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <label for="termos" class="text-sm text-gray-600">Li e concordo com os <a href="politica.html" target="_blank" class="text-blue-600 hover:underline">Termos de Uso</a>.</label>
+            </div>
+
+            <button type="submit" id="btnSalvar" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg mt-4">FINALIZAR CADASTRO</button>
+        </form>
+    </div>
+
+    <div id="modal-crop" class="modal-fundo">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-2">Ajuste a Capa</h3>
+            <div class="crop-container"><img id="image-to-crop" style="max-width: 100%;"></div>
+            <div class="flex gap-2 mt-4">
+                <button type="button" onclick="fecharModal()" class="w-1/2 bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button>
+                <button type="button" onclick="confirmarRecorte()" class="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-bold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+     <script>
+         lucide.createIcons();
+        
+        let cropper = null;
+        let blobCapaFinal = null; 
+
+        // ========================================================
+        // ⚠️ COLE SUAS CHAVES AQUI
+        // ========================================================
+        const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
+        const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
+        let client = null;
+        try { client = supabase.createClient(URL_API, KEY_API); } catch(e){}
+
+        window.mudarPlano = function(plano) {
+            const area = document.getElementById('areaPro');
+            const inputs = area.querySelectorAll('input');
+            if (plano === 'gratis') {
+                area.classList.add('bloqueado', 'bg-gray-100', 'border-gray-200');
+                area.classList.remove('bg-yellow-50', 'border-yellow-200');
+                inputs.forEach(i => { i.disabled = true; i.value = ""; });
+            } else {
+                area.classList.remove('bloqueado', 'bg-gray-100', 'border-gray-200');
+                area.classList.add('bg-yellow-50', 'border-yellow-200');
+                inputs.forEach(i => i.disabled = false);
+            }
+        }
+
+        window.abrirRecorte = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('modal-crop').style.display = 'flex';
+                    const img = document.getElementById('image-to-crop');
+                    img.src = e.target.result;
+                    setTimeout(() => {
+                        if(cropper) cropper.destroy();
+                        cropper = new Cropper(img, { aspectRatio: 16/9, viewMode: 1 });
+                    }, 100);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+            input.value = '';
+        }
+        window.confirmarRecorte = function() {
+            if (!cropper) return;
+            cropper.getCroppedCanvas({ width: 800 }).toBlob(function(blob) {
+                blobCapaFinal = blob;
+                document.getElementById('previewCapa').src = URL.createObjectURL(blob);
+                document.getElementById('previewCapa').classList.remove('hidden');
+                document.getElementById('txtCapa').innerText = "Capa Definida ✅";
+                fecharModal();
+            }, 'image/jpeg', 0.8);
+        }
+        window.fecharModal = function() {
+            document.getElementById('modal-crop').style.display = 'none';
+            if(cropper) { cropper.destroy(); cropper = null; }
+        }
+
+        async function uploadArquivo(arquivo, nomeBase) {
+            if (!arquivo) return null;
+            const nomeArquivo = `${Date.now()}_${nomeBase}.jpg`;
+            const { error } = await client.storage.from('sier-images').upload(nomeArquivo, arquivo);
+            if(error) return null;
+            const { data } = client.storage.from('sier-images').getPublicUrl(nomeArquivo);
+            return data.publicUrl;
+        }
+
+        window.buscarCep = async () => {
+            const cep = document.getElementById('cep').value.replace(/\D/g, '');
+            if(cep.length === 8) {
+                try {
+                    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await res.json();
+                    if(!data.erro) {
+                        document.getElementById('endereco').value = `${data.logradouro}, ${data.bairro}`;
+                        document.getElementById('cidade').value = data.localidade;
+                        document.getElementById('estado').value = data.uf;
+                    }
+                } catch(e){}
+            }
+        };
+
+        // 🔴 CORREÇÃO: ADICIONEI 'async' AQUI PARA NÃO TRAVAR O NAVEGADOR
+        document.getElementById('formCadastro').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            const btn = document.getElementById('btnSalvar');
+            const txtOriginal = btn.innerText;
+            
+            btn.innerText = 'Processando...'; 
+            btn.disabled = true;
+
+            try {
+                if(!blobCapaFinal) throw new Error("A foto de CAPA é obrigatória.");
+                const doc = document.getElementById('documento').value.replace(/\D/g, '');
+                if(doc.length < 11) throw new Error("CPF/CNPJ inválido.");
+                const plano = document.querySelector('input[name="plano"]:checked').value;
+                
+                // UPLOADS (Agora funciona pois a função pai é async)
+                const urlCapa = await uploadArquivo(blobCapaFinal, 'capa');
+                const u1 = await uploadArquivo(document.getElementById('foto1').files[0], 'f1');
+                const u2 = await uploadArquivo(document.getElementById('foto2').files[0], 'f2');
+                const u3 = await uploadArquivo(document.getElementById('foto3').files[0], 'f3');
+
+                const { error } = await client.from('lojas').insert([{
+                    documento: doc,
+                    nome_fantasia: document.getElementById('nome').value,
+                    categoria: document.getElementById('categoria').value,
+                    descricao: document.getElementById('descricao').value,
+                    whatsapp: document.getElementById('whatsapp').value,
+                    instagram: document.getElementById('instagram').value,
+                    site: document.getElementById('site').value,
+                    cep: document.getElementById('cep').value,
+                    endereco: document.getElementById('endereco').value,
+                    cidade: document.getElementById('cidade').value,
+                    estado: document.getElementById('estado').value,
+                    plano: plano,
+                    ativo: true,
+                    logo_url: urlCapa,
+                    foto1: u1, foto2: u2, foto3: u3
+                }]);
+
+                if (error) {
+                    if(error.code === '23505') throw new Error("Este CPF/CNPJ já possui cadastro.");
+                    throw error;
+                }
+
+                alert('🎉 Cadastro realizado! Redirecionando...');
+
+                // 🔴 CORREÇÃO DO LINK: Use apenas o nome do arquivo
+                if (plano === 'pro') {
+                    window.location.href = "assinar-pro.html";
+                } else {
+                    window.location.href = "Vitrine.html";
+                }
+
+            } catch (err) {
+                alert('Erro: ' + err.message);
+                btn.innerText = txtOriginal;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
+   
+
+       

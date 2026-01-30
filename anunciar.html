@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anuncie na SierCompany</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .plano-card { transition: all 0.3s; border: 2px solid transparent; cursor: pointer; }
+        .plano-card:hover { transform: translateY(-5px); }
+        .plano-selecionado { border-color: #0066FF; background-color: #eff6ff; }
+        .modal-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .crop-container { max-height: 50vh; overflow: hidden; background: #000; display: flex; justify-content: center; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+    <header class="bg-[#111111] py-4 shadow-md">
+        <div class="max-w-3xl mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white">SIER<span class="text-[#0066FF]">ADS</span></h1>
+            <a href="Vitrine.html" class="text-gray-400 text-xs border border-gray-700 px-3 py-1.5 rounded-full hover:text-white">Cancelar</a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-8 pb-20">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Coloque sua marca no topo 🚀</h2>
+            <p class="text-gray-600">Escolha seu plano e apareça para milhares de clientes.</p>
+        </div>
+
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">1</span> Escolha a duração</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div id="card7" onclick="selecionarPlano(7, this)" class="plano-card bg-white p-6 rounded-xl shadow-sm text-center">
+                <h4 class="font-bold text-gray-500">Curto Prazo</h4>
+                <p class="text-3xl font-bold text-gray-900 my-2">7 Dias</p>
+                <p class="text-blue-600 font-bold" id="price7">R$ 49,90</p>
+            </div>
+            <div id="card14" onclick="selecionarPlano(14, this)" class="plano-card bg-white p-6 rounded-xl shadow-sm text-center relative">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-full">POPULAR</div>
+                <h4 class="font-bold text-gray-500">Médio Prazo</h4>
+                <p class="text-3xl font-bold text-gray-900 my-2">14 Dias</p>
+                <p class="text-blue-600 font-bold" id="price14">R$ 89,90</p>
+            </div>
+            <div id="card30" onclick="selecionarPlano(30, this)" class="plano-card bg-white p-6 rounded-xl shadow-sm text-center">
+                <h4 class="font-bold text-gray-500">Mensal</h4>
+                <p class="text-3xl font-bold text-gray-900 my-2">30 Dias</p>
+                <p class="text-blue-600 font-bold" id="price30">R$ 149,90</p>
+            </div>
+        </div>
+
+        <div id="etapa2" class="opacity-50 pointer-events-none transition-all">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">2</span> Sua Propaganda</h3>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-8">
+                <div class="space-y-4">
+                    <button onclick="document.getElementById('fileBanner').click()" class="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-blue-400 transition">
+                        <i data-lucide="image-plus" class="w-8 h-8 mb-2"></i>
+                        <span id="txtBanner">Clique para subir a imagem do banner</span>
+                    </button>
+                    <input type="file" id="fileBanner" accept="image/*" class="hidden" onchange="abrirRecorte(this)">
+                    <img id="previewBanner" class="w-full h-32 object-cover rounded hidden border">
+                    <div><label class="text-xs font-bold text-gray-500">Link de Destino</label><input type="text" id="linkDestino" placeholder="Ex: Link do seu WhatsApp" class="w-full p-3 border rounded-lg mt-1"></div>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">3</span> Identificação</h3>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-8 space-y-4">
+                <input type="text" id="nomeCliente" placeholder="Seu Nome ou Nome da Loja" class="w-full p-3 border rounded-lg">
+                <input type="tel" id="telCliente" placeholder="Seu WhatsApp para contato" class="w-full p-3 border rounded-lg">
+            </div>
+
+            <div class="bg-gray-900 text-white p-6 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                    <span>Total a Pagar:</span>
+                    <span class="text-3xl font-bold text-green-400" id="totalPagar">R$ 0,00</span>
+                </div>
+                <button onclick="finalizarPedido()" id="btnPagar" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg flex justify-center gap-2">
+                    GERAR PIX E FINALIZAR <i data-lucide="qr-code"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-pix" class="modal-fundo">
+        <div class="bg-white p-6 rounded-2xl max-w-sm w-full m-4 shadow-2xl relative">
+            <button onclick="document.getElementById('modal-pix').style.display='none'" class="absolute top-4 right-4 text-gray-400"><i data-lucide="x"></i></button>
+            <div class="text-center">
+                <h2 class="text-xl font-bold text-gray-800 mb-1">Pagamento via Pix</h2>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-left">
+                    <p class="text-xs font-bold text-yellow-800 mb-1">DADOS:</p>
+                    <p class="text-xs text-gray-600"><strong>Nome:</strong> Erica Rios Oliveira Dias</p>
+                    <p class="text-xs text-gray-600"><strong>Banco:</strong> Cora SCD</p>
+                    <p class="text-xs text-gray-600"><strong>Chave:</strong> CNPJ (Abaixo)</p>
+                </div>
+                <div class="flex justify-center mb-4"><div id="qrcode-container" class="border-4 border-gray-900 rounded-lg p-2"></div></div>
+                <div class="mb-4 flex gap-2"><input type="text" id="pixCopiaCola" readonly class="w-full text-xs bg-gray-100 border p-2 rounded truncate"><button onclick="copiarPix()" class="bg-blue-600 text-white px-3 rounded font-bold"><i data-lucide="copy" class="w-3 h-3"></i></button></div>
+                <a id="btnZapComprovante" href="#" target="_blank" class="block w-full bg-green-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i> Enviar Comprovante</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-crop" class="modal-fundo">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-2">Ajustar Banner</h3>
+            <div class="crop-container"><img id="image-to-crop" style="max-width: 100%;"></div>
+            <div class="flex gap-2 mt-4"><button onclick="fecharModal()" class="w-1/2 bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button><button onclick="confirmarRecorte()" class="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-bold">Confirmar</button></div>
+        </div>
+    </div>
+
+   <script>
+        lucide.createIcons();
+        
+        // ⚠️ COLE SUAS CHAVES AQUI
+        const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
+        const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
+        
+        const PIX_CHAVE = "35703153000180"; 
+        const PIX_NOME = "Erica Rios Oliveira Dias"; 
+        const PIX_CIDADE = "Salvador"; 
+        const MEU_ZAP = "55719999466243";
+
+        let client = null;
+        try { client = supabase.createClient(URL_API, KEY_API); } catch(e){}
+
+        let planoSelecionado = null;
+        let blobBanner = null;
+        let cropper = null;
+        
+        // VALORES PADRÃO (FALLBACK)
+        let precosAtuais = { 7: 49.90, 14: 89.90, 30: 149.90 };
+
+        async function carregarPrecos() {
+            try {
+                const { data } = await client.from('precos').select('*');
+                if(data && data.length > 0) {
+                    data.forEach(p => {
+                        if(p.chave === 'banner_7d') { precosAtuais[7] = parseFloat(p.valor); document.getElementById('price7').innerText = `R$ ${p.valor.replace('.',',')}`; }
+                        if(p.chave === 'banner_14d') { precosAtuais[14] = parseFloat(p.valor); document.getElementById('price14').innerText = `R$ ${p.valor.replace('.',',')}`; }
+                        if(p.chave === 'banner_30d') { precosAtuais[30] = parseFloat(p.valor); document.getElementById('price30').innerText = `R$ ${p.valor.replace('.',',')}`; }
+                    });
+                }
+            } catch(e) { 
+                console.log('Usando preços padrão'); 
+                // Se der erro, os valores padrão (que já estão escritos no HTML) permanecem.
+            }
+        }
+        carregarPrecos();
+
+        function selecionarPlano(dias, el) {
+            document.querySelectorAll('.plano-card').forEach(c => c.classList.remove('plano-selecionado'));
+            el.classList.add('plano-selecionado');
+            
+            const valor = precosAtuais[dias];
+            planoSelecionado = { dias, valor };
+            
+            document.getElementById('totalPagar').innerText = valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            document.getElementById('etapa2').classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+        window.abrirRecorte = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('modal-crop').style.display = 'flex';
+                    const img = document.getElementById('image-to-crop');
+                    img.src = e.target.result;
+                    setTimeout(() => { if(cropper) cropper.destroy(); cropper = new Cropper(img, { aspectRatio: 3/1, viewMode: 1, autoCropArea: 1 }); }, 100);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+            input.value = '';
+        }
+        window.confirmarRecorte = function() {
+            if(!cropper) return;
+            cropper.getCroppedCanvas({ width: 1200 }).toBlob(b => {
+                blobBanner = b;
+                document.getElementById('previewBanner').src = URL.createObjectURL(b);
+                document.getElementById('previewBanner').classList.remove('hidden');
+                document.getElementById('txtBanner').innerText = "Banner OK ✅";
+                fecharModal();
+            }, 'image/jpeg', 0.85);
+        }
+        window.fecharModal = function() { document.getElementById('modal-crop').style.display = 'none'; if(cropper) { cropper.destroy(); cropper = null; } }
+
+        async function finalizarPedido() {
+            const btn = document.getElementById('btnPagar');
+            const txtOriginal = btn.innerHTML;
+            if(!planoSelecionado || !blobBanner) return alert("Complete o pedido!");
+            const nome = document.getElementById('nomeCliente').value;
+            const tel = document.getElementById('telCliente').value;
+            if(!nome || !tel) return alert("Preencha seus dados!");
+
+            btn.disabled = true; btn.innerText = "Processando...";
+
+            try {
+                const nomeArq = `banner_ads_${Date.now()}.jpg`;
+                const { error: errUp } = await client.storage.from('sier-images').upload(nomeArq, blobBanner);
+                if(errUp) throw errUp;
+                const { data: urlData } = client.storage.from('sier-images').getPublicUrl(nomeArq);
+
+                await client.from('banners').insert([{
+                    imagem_url: urlData.publicUrl, link_destino: document.getElementById('linkDestino').value,
+                    nome_cliente: nome, telefone_cliente: tel, plano_dias: planoSelecionado.dias, status: 'pendente'
+                }]);
+
+                const payload = gerarPayloadPix(PIX_CHAVE, PIX_NOME, PIX_CIDADE, planoSelecionado.valor.toFixed(2), "SIERADS");
+                document.getElementById('modal-pix').style.display = 'flex';
+                document.getElementById('qrcode-container').innerHTML = ""; 
+                new QRCode(document.getElementById("qrcode-container"), { text: payload, width: 150, height: 150 });
+                document.getElementById('pixCopiaCola').value = payload;
+                
+                const msgZap = `Olá! Paguei o Banner (${planoSelecionado.dias} dias - R$${planoSelecionado.valor}). Segue o comprovante:`;
+                document.getElementById('btnZapComprovante').href = `https://wa.me/${MEU_ZAP}?text=${encodeURIComponent(msgZap)}`;
+                btn.innerHTML = txtOriginal;
+
+            } catch (err) { alert("Erro: " + err.message); btn.disabled = false; btn.innerHTML = txtOriginal; }
+        }
+
+        function copiarPix() {
+            const c = document.getElementById("pixCopiaCola"); c.select(); c.setSelectionRange(0,99999);
+            navigator.clipboard.writeText(c.value); alert("Copiado!");
+        }
+
+        function gerarPayloadPix(chave, nome, cidade, valor, txtId) {
+            const nomeT = nome.substring(0,25).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const cidadeT = cidade.substring(0,15).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const val = valor.toString();
+            const merchant = `0014BR.GOV.BCB.PIX01${chave.length}${chave}`;
+            let p = `00020126${merchant.length}${merchant}520400005303986540${val.length}${val}5802BR59${(nomeT.length<10?'0':'')+nomeT.length}${nomeT}60${(cidadeT.length<10?'0':'')+cidadeT.length}${cidadeT}62070503***6304`;
+            return p + crc16(p);
+        }
+        function crc16(buffer) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < buffer.length; i++) {
+                crc = ((crc >>> 8) | (crc << 8)) & 0xffff;
+                crc ^= (buffer.charCodeAt(i) & 0x00ff);
+                crc ^= ((crc & 0xff) >> 4);
+                crc ^= (crc << 12) & 0xffff;
+                crc ^= ((crc & 0xFF) << 5) & 0xffff;
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0');
+        }
+    </script>
+</body>
+</html>    
+        
+       
