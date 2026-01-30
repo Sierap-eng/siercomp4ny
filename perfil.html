@@ -126,7 +126,7 @@
 
                 } else {
                     // PRO: Libera tudo
-                    document.getElementById('btnZap').href = `https://wa.me/55${loja.whatsapp.replace(/\D/g,'')}`;
+                    document.getElementById('btnZap').<a href="https://wa.me/55${store.whatsapp.replace(/\D/g,'')}" target="_blank" onclick="registrarClick('${store.id}', '${store.categoria}', 'whatsapp')" ...>'')}`;
                     
                     const enderecoFull = `${loja.endereco}, ${loja.cidade} - ${loja.estado}`;
                     document.getElementById('btnMapa').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoFull)}`;
@@ -175,3 +175,4 @@
 </body>
 
 </html>
+
