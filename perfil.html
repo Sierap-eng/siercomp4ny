@@ -8,146 +8,62 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .btn-bloqueado { 
-            background: #f3f4f6 !important; 
-            color: #9ca3af !important; 
-            border: 1px solid #e5e7eb !important;
-            cursor: not-allowed !important; 
-            pointer-events: none !important;
-            box-shadow: none !important;
-            background-image: none !important;
-        }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; } .btn-bloqueado { background: #f3f4f6 !important; color: #9ca3af !important; cursor: not-allowed !important; pointer-events: none !important; }</style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-
     <header class="bg-[#111111] sticky top-0 z-50 shadow-md border-b border-gray-800">
         <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold text-white tracking-tighter">SIER<span class="text-[#0066FF]">COMP4NY</span></h1>
-            <a href="index.html" class="text-gray-400 text-sm border border-gray-700 px-4 py-1.5 rounded-full hover:text-white hover:border-white transition">Voltar</a>
+            <a href="index.html" class="text-gray-400 text-sm border border-gray-700 px-4 py-1.5 rounded-full hover:text-white transition">Voltar</a>
         </div>
     </header>
-
     <main id="conteudoLoja" class="flex-grow max-w-2xl w-full mx-auto p-4 hidden">
-        
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-6 border border-gray-100">
-            <div class="h-48 overflow-hidden bg-gray-200">
-                <img id="imgCapa" class="w-full h-full object-cover">
-            </div>
+            <div class="h-48 overflow-hidden bg-gray-200"><img id="imgCapa" class="w-full h-full object-cover"></div>
             <div class="p-6 relative">
                 <span id="txtCategoria" class="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded text-gray-500 uppercase tracking-wide border border-gray-200"></span>
                 <h1 id="txtNome" class="text-3xl font-bold text-gray-900 mt-3 mb-2 leading-tight"></h1>
                 <p id="txtDescricao" class="text-gray-600 text-sm leading-relaxed"></p>
-
-                <div id="areaUpgrade" class="hidden mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                    <p class="text-yellow-800 font-bold text-sm mb-1 flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Recursos Bloqueados</p>
-                    <p class="text-xs text-gray-600 mb-3">Esta loja está no plano Grátis.</p>
-                    <a href="assinar-pro.html" class="block w-full bg-[#D4AF37] text-white font-bold py-3 rounded-lg hover:bg-[#b5952f] transition shadow-md text-sm">QUERO VIRAR PARCEIRO PRO ⚡</a>
                 </div>
-            </div>
         </div>
-
         <div class="grid grid-cols-2 gap-3 mb-6">
             <a id="btnZap" href="#" class="flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white transition shadow-sm bg-[#25D366] hover:bg-green-600"><i data-lucide="message-circle" class="w-5 h-5"></i> WhatsApp</a>
             <a id="btnInsta" href="#" target="_blank" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:opacity-90 transition"><i data-lucide="instagram" class="w-5 h-5"></i> Instagram</a>
             <a id="btnSite" href="#" target="_blank" class="bg-blue-600 text-white col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hidden hover:bg-blue-700 transition"><i data-lucide="globe" class="w-5 h-5"></i> Visitar Site</a>
             <a id="btnMapa" href="#" target="_blank" class="bg-white text-gray-700 border border-gray-200 col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:bg-gray-50 transition"><i data-lucide="map-pin" class="w-5 h-5"></i> Ver Endereço no Mapa</a>
         </div>
-
-        <div id="areaGaleria" class="hidden">
-            <h3 class="font-bold text-gray-800 mb-3 ml-1 text-sm uppercase tracking-wide">Galeria de Fotos</h3>
-            <div class="grid grid-cols-3 gap-2" id="gridFotos"></div>
-        </div>
+        <div id="areaGaleria" class="hidden"><h3 class="font-bold text-gray-800 mb-3 ml-1 text-sm uppercase">Galeria</h3><div class="grid grid-cols-3 gap-2" id="gridFotos"></div></div>
     </main>
-
-    <div id="loading" class="flex flex-col items-center justify-center h-[60vh] text-gray-400">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2"></div>
-    </div>
-
-    <footer class="bg-black py-8 border-t border-gray-900 mt-auto text-center">
-        <p class="text-gray-500 text-sm mb-1">Tecnologia <span class="text-[#FF6600] font-bold">Sier Growth</span></p>
-        <p class="text-[10px] text-gray-600">Todos os direitos reservados © 2026</p>
-    </footer>
-
+    <div id="loading" class="flex flex-col items-center justify-center h-[60vh] text-gray-400"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2"></div></div>
+    <footer class="bg-black py-8 border-t border-gray-900 mt-auto text-center"><p class="text-gray-500 text-sm mb-1">Tecnologia <span class="text-[#FF6600] font-bold">Sier Growth</span></p></footer>
     <script>
         lucide.createIcons();
-
-        // ⚠️ COLE SUAS CHAVES AQUI
-        const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
-        const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
-        
+        const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co'; const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
         const client = supabase.createClient(URL_API, KEY_API);
-
-        // --- FUNÇÃO DE RASTREAMENTO ADICIONADA ---
-        window.registrarClick = async function(lojaId, segmento, tipo) {
-            try { await client.from('clicks').insert([{ loja_id: lojaId, segmento: segmento, tipo: tipo }]); } catch(e) {}
-        }
-
+        window.registrarClick = async function(lojaId, segmento, tipo) { try { await client.from('clicks').insert([{ loja_id: lojaId, segmento: segmento, tipo: tipo }]); } catch(e) {} }
         async function carregar() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if(!id) { window.location.href = 'index.html'; return; }
-
+            const params = new URLSearchParams(window.location.search); const id = params.get('id'); if(!id) { window.location.href = 'index.html'; return; }
             try {
                 const { data: loja, error } = await client.from('lojas').select('*').eq('id', id).single();
                 if (error || !loja) throw new Error("Loja inexistente.");
-
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('conteudoLoja').classList.remove('hidden');
-
+                document.getElementById('loading').classList.add('hidden'); document.getElementById('conteudoLoja').classList.remove('hidden');
                 document.getElementById('imgCapa').src = loja.logo_url || 'https://placehold.co/600x400';
                 document.getElementById('txtNome').innerText = loja.nome_fantasia;
                 document.getElementById('txtCategoria').innerText = loja.categoria;
                 document.getElementById('txtDescricao').innerText = loja.descricao;
-
                 if (loja.plano === 'gratis') {
-                    document.getElementById('areaUpgrade').classList.remove('hidden');
-                    const travar = (idBtn, texto, full=false) => {
-                        const btn = document.getElementById(idBtn);
-                        if(btn) {
-                            btn.className = `flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold btn-bloqueado ${full?'col-span-2':''}`;
-                            btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> ${texto}`;
-                            btn.removeAttribute('href'); btn.removeAttribute('target');
-                        }
-                    };
-                    travar('btnZap', 'WhatsApp Bloqueado');
-                    travar('btnInsta', 'Instagram Bloqueado');
-                    travar('btnSite', 'Site Bloqueado', true);
-                    travar('btnMapa', 'Endereço Bloqueado', true);
+                    const travar = (idBtn, texto, full=false) => { const btn = document.getElementById(idBtn); if(btn) { btn.className = `flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold btn-bloqueado ${full?'col-span-2':''}`; btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> ${texto}`; btn.removeAttribute('href'); } };
+                    travar('btnZap', 'Bloqueado'); travar('btnInsta', 'Bloqueado'); travar('btnSite', 'Bloqueado', true); travar('btnMapa', 'Bloqueado', true);
                     document.getElementById('btnSite').classList.remove('hidden');
-
                 } else {
-                    // Botão WhatsApp com Tracking
-                    const zapLink = `https://wa.me/55${loja.whatsapp.replace(/\D/g,'')}`;
-                    const btnZap = document.getElementById('btnZap');
-                    btnZap.href = zapLink;
-                    // Adiciona o evento de clique via JS para evitar erro de aspas
-                    btnZap.onclick = function() { registrarClick(loja.id, loja.categoria, 'whatsapp_perfil'); };
-                    
-                    const enderecoFull = `${loja.endereco}, ${loja.cidade} - ${loja.estado}`;
-                    document.getElementById('btnMapa').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoFull)}`;
-                    
-                    if(loja.instagram) document.getElementById('btnInsta').href = `https://instagram.com/${loja.instagram.replace('@','').replace('https://instagram.com/','')}`;
-                    else document.getElementById('btnInsta').classList.add('hidden');
-
-                    if(loja.site) {
-                        document.getElementById('btnSite').classList.remove('hidden');
-                        let s = loja.site; if(!s.startsWith('http')) s = 'http://'+s;
-                        document.getElementById('btnSite').href = s;
-                    } else document.getElementById('btnSite').classList.add('hidden');
-
-                    if (loja.foto1 || loja.foto2 || loja.foto3) {
-                        document.getElementById('areaGaleria').classList.remove('hidden');
-                        const grid = document.getElementById('gridFotos');
-                        [loja.foto1, loja.foto2, loja.foto3].forEach(f => {
-                            if(f) grid.innerHTML += `<img src="${f}" class="w-full h-24 object-cover rounded-lg border shadow-sm cursor-pointer hover:opacity-90" onclick="window.open(this.src)">`;
-                        });
-                    }
+                    const zapLink = `https://wa.me/55${loja.whatsapp.replace(/\D/g,'')}`; document.getElementById('btnZap').href = zapLink; document.getElementById('btnZap').onclick = function() { registrarClick(loja.id, loja.categoria, 'whatsapp_perfil'); };
+                    document.getElementById('btnMapa').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loja.endereco + ', ' + loja.cidade)}`;
+                    if(loja.instagram) document.getElementById('btnInsta').href = `https://instagram.com/${loja.instagram.replace('@','').replace('https://instagram.com/','')}`; else document.getElementById('btnInsta').classList.add('hidden');
+                    if(loja.site) { let s = loja.site; if(!s.startsWith('http')) s = 'http://'+s; document.getElementById('btnSite').href = s; document.getElementById('btnSite').classList.remove('hidden'); } else document.getElementById('btnSite').classList.add('hidden');
+                    if (loja.foto1 || loja.foto2 || loja.foto3) { document.getElementById('areaGaleria').classList.remove('hidden'); const grid = document.getElementById('gridFotos'); [loja.foto1, loja.foto2, loja.foto3].forEach(f => { if(f) grid.innerHTML += `<img src="${f}" class="w-full h-24 object-cover rounded-lg border shadow-sm cursor-pointer hover:opacity-90" onclick="window.open(this.src)">`; }); }
                 }
                 lucide.createIcons();
-            } catch (err) { console.error(err); alert("Erro ao carregar loja."); window.location.href = 'index.html'; }
+            } catch (err) { window.location.href = 'index.html'; }
         }
         carregar();
     </script>
