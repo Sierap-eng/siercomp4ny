@@ -26,8 +26,10 @@
         body { font-family: 'Inter', sans-serif; }
         .swiper { width: 100%; border-radius: 12px; }
         .swiper-slide { overflow: hidden; border-radius: 12px; }
-        .swiper-slide img { width: 100%; height: 140px; object-fit: cover; display: block; }
-        @media (min-width: 768px) { .swiper-slide img { height: 220px; } }
+        
+        /* AJUSTE DE ALTURA DO BANNER (MENOR) */
+        .swiper-slide img { width: 100%; height: 80px; object-fit: cover; display: block; }
+        @media (min-width: 768px) { .swiper-slide img { height: 150px; } }
         
         .card-image-wrapper { height: 130px; overflow: hidden; position: relative; }
         .card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
@@ -44,9 +46,7 @@
                 </div>
                 <div class="flex gap-2">
                     <a href="admin.html" class="text-gray-600 hover:text-white px-2 py-2" title="Painel do Dono"><i data-lucide="lock" class="w-4 h-4"></i></a>
-                    <a href="cadastro.html" class="bg-sier-blue text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-blue-600 transition shadow-lg">
-                        Divulgar Grátis
-                    </a>
+                    <a href="cadastro.html" class="bg-sier-blue text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-blue-600 transition shadow-lg">Divulgar Grátis</a>
                 </div>
             </div>
             <div class="relative">
@@ -54,7 +54,6 @@
                 <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-500 w-5 h-5"></i>
             </div>
         </div>
-
         <div class="bg-white/5 border-t border-white/10 backdrop-blur-md">
             <div class="max-w-5xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar">
                 <button onclick="filtrar('Todos')" class="px-4 py-2 rounded-full text-xs font-bold bg-sier-blue text-white shadow">Tudo</button>
@@ -68,7 +67,6 @@
     </header>
 
     <main class="flex-grow max-w-5xl mx-auto px-4 mt-6 space-y-6 pb-12 w-full">
-        
         <div id="areaBanners" class="hidden w-full">
             <div class="swiper mySwiper shadow-sm border border-gray-200 bg-white">
                 <div class="swiper-wrapper" id="bannerWrapper"></div>
@@ -76,18 +74,16 @@
             </div>
             <div class="text-right mt-1">
                 <a href="anunciar.html" class="text-[10px] font-bold text-gray-400 hover:text-sier-blue flex justify-end items-center gap-1 transition">
-                    <i data-lucide="rocket" class="w-3 h-3"></i> Anuncie aqui (Self-Service)
+                    <i data-lucide="rocket" class="w-3 h-3"></i> Anuncie ou Vire PRO
                 </a>
             </div>
         </div>
         
         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2 border-l-4 border-sier-blue pl-3">Destaques da Região</h2>
-        
         <div id="storesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div class="animate-pulse bg-white h-56 rounded-xl border border-gray-200"></div>
             <div class="animate-pulse bg-white h-56 rounded-xl border border-gray-200"></div>
         </div>
-        
         <div id="emptyState" class="hidden text-center py-12 text-gray-500">
             <i data-lucide="store" class="w-12 h-12 mx-auto text-gray-300 mb-2"></i>
             <p>Nenhuma loja encontrada.</p>
@@ -95,10 +91,7 @@
     </main>
 
     <footer class="bg-black py-10 border-t border-gray-900 mt-auto text-center">
-        <div class="flex justify-center gap-4 mb-6">
-            <a href="politica.html" class="text-gray-500 text-xs hover:text-white">Termos</a>
-            <a href="admin.html" class="text-gray-500 text-xs hover:text-white">Área do Parceiro</a>
-        </div>
+        <div class="flex justify-center gap-4 mb-6"><a href="politica.html" class="text-gray-500 text-xs hover:text-white">Termos</a><a href="admin.html" class="text-gray-500 text-xs hover:text-white">Área do Parceiro</a></div>
         <div class="border-t border-gray-800 w-1/2 mx-auto mb-6"></div>
         <p class="text-gray-400 text-sm mb-1">Tecnologia <span class="text-[#FF6600] font-bold">Sier Growth</span></p>
         <p class="text-[10px] text-gray-600 font-medium">Dias Anderson • Founder & Lead Developer</p>
@@ -106,110 +99,56 @@
 
     <script>
         lucide.createIcons();
-        
-        // ⚠️ COLE SUAS CHAVES DO SUPABASE AQUI
         const URL_PROJETO = 'https://zjtnlyjrxkwybqesszyd.supabase.co'; 
         const CHAVE_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY'; 
-
         const client = supabase.createClient(URL_PROJETO, CHAVE_API);
         let allStores = []; 
-
         async function iniciar() { await carregarBanners(); await carregarLojas(); }
 
-        // --- FUNÇÃO DE RASTREAMENTO (IMPORTANTE) ---
-        // Deve estar global para o onclick funcionar
         window.registrarClick = async function(lojaId, segmento, tipo) {
-            try {
-                await client.from('clicks').insert([{ loja_id: lojaId, segmento: segmento, tipo: tipo }]);
-                console.log('Click registrado');
-            } catch(e) {}
+            try { await client.from('clicks').insert([{ loja_id: lojaId, segmento: segmento, tipo: tipo }]); } catch(e) {}
         }
 
         async function carregarBanners() {
             const { data } = await client.from('banners').select('*').eq('status', 'ativo').order('created_at', {ascending: false});
-            
-            // Filtra banners sem imagem
             const bannersValidos = data ? data.filter(b => b.imagem_url) : [];
-
             if (bannersValidos.length > 0) {
                 document.getElementById('areaBanners').classList.remove('hidden');
-                const wrapper = document.getElementById('bannerWrapper');
-                wrapper.innerHTML = ''; // Limpa antes de adicionar
-
-                wrapper.innerHTML = bannersValidos.map(b => 
-                    `<div class="swiper-slide">
-                        ${b.link_destino ? `<a href="${b.link_destino}" target="_blank"><img src="${b.imagem_url}"></a>` : `<img src="${b.imagem_url}">`}
-                    </div>`
-                ).join('');
-
-                new Swiper(".mySwiper", { 
-                    loop: bannersValidos.length > 1, // Só faz loop se tiver mais de 1
-                    autoplay: { delay: 3500, disableOnInteraction: false }, 
-                    pagination: { clickable: true }, 
-                    spaceBetween: 0
-                });
+                document.getElementById('bannerWrapper').innerHTML = bannersValidos.map(b => {
+                    // CORREÇÃO DO LINK: Garante HTTPS
+                    let link = b.link_destino;
+                    if(link && !link.startsWith('http')) link = 'https://' + link;
+                    return `<div class="swiper-slide">${link ? `<a href="${link}" target="_blank"><img src="${b.imagem_url}"></a>` : `<img src="${b.imagem_url}">`}</div>`;
+                }).join('');
+                new Swiper(".mySwiper", { loop: bannersValidos.length>1, autoplay: { delay: 3500 }, pagination: { clickable: true } });
             }
         }
 
         async function carregarLojas() {
             const { data } = await client.from('lojas').select('*').eq('ativo', true).order('created_at', { ascending: false });
-            if (data) {
-                allStores = data.sort((a, b) => (a.plano === 'pro' && b.plano !== 'pro') ? -1 : 1);
-                renderStores(allStores);
-            }
+            if (data) { allStores = data.sort((a, b) => (a.plano === 'pro' && b.plano !== 'pro') ? -1 : 1); renderStores(allStores); }
         }
 
         function renderStores(stores) {
-            const grid = document.getElementById('storesGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('storesGrid'); grid.innerHTML = '';
             if (!stores || stores.length === 0) { grid.classList.add('hidden'); document.getElementById('emptyState').classList.remove('hidden'); return; }
             grid.classList.remove('hidden'); document.getElementById('emptyState').classList.add('hidden');
-
             stores.forEach(store => {
                 const isPro = store.plano === 'pro';
                 const borderClass = isPro ? 'border border-[#D4AF37] shadow-md' : 'border border-gray-100';
-                const badge = isPro ? '<span class="absolute top-2 right-2 bg-black text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded shadow z-10 flex items-center gap-1 border border-[#D4AF37]"><i data-lucide="crown" class="w-3 h-3 fill-current"></i> PARCEIRO PRO</span>' : '';
-
-                // BOTÃO ZAP CORRIGIDO
+                const badge = isPro ? '<span class="absolute top-2 right-2 bg-black text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded shadow z-10 flex items-center gap-1 border border-[#D4AF37]"><i data-lucide="crown" class="w-3 h-3 fill-current"></i> PRO</span>' : '';
+                
                 let botoesRodape = '';
                 if(isPro) {
                     const linkZap = `https://wa.me/55${store.whatsapp.replace(/\D/g,'')}`;
-                    botoesRodape = `
-                    <a href="${linkZap}" 
-                       target="_blank" 
-                       onclick="registrarClick('${store.id}', '${store.categoria}', 'whatsapp')"
-                       class="flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-whatsapp hover:bg-green-600 py-2 rounded-lg transition w-full shadow-sm">
-                       <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
-                    </a>`;
+                    botoesRodape = `<a href="${linkZap}" target="_blank" onclick="registrarClick('${store.id}', '${store.categoria}', 'whatsapp')" class="flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-whatsapp hover:bg-green-600 py-2 rounded-lg transition w-full shadow-sm"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>`;
                 } else {
-                    botoesRodape = `
-                        <div class="flex gap-2">
-                            <a href="perfil.html?id=${store.id}" class="flex-1 text-center text-[10px] font-bold text-gray-600 border border-gray-200 bg-gray-50 py-2 rounded-lg hover:bg-gray-100">Ver</a>
-                            <a href="assinar-pro.html" class="flex-1 text-center text-[10px] font-bold text-white bg-[#D4AF37] py-2 rounded-lg hover:bg-[#b5952f] shadow-sm flex items-center justify-center gap-1">
-                                <i data-lucide="zap" class="w-3 h-3"></i> Seja PRO
-                            </a>
-                        </div>
-                    `;
+                    botoesRodape = `<div class="flex gap-2"><a href="perfil.html?id=${store.id}" class="flex-1 text-center text-[10px] font-bold text-gray-600 border border-gray-200 bg-gray-50 py-2 rounded-lg hover:bg-gray-100">Ver</a><a href="assinar-pro.html" class="flex-1 text-center text-[10px] font-bold text-white bg-[#D4AF37] py-2 rounded-lg hover:bg-[#b5952f] shadow-sm flex items-center justify-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> PRO</a></div>`;
                 }
-
-                grid.innerHTML += `
-                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all ${borderClass} group h-full flex flex-col relative">
-                    <a href="perfil.html?id=${store.id}" class="block card-image-wrapper relative">
-                        <img src="${store.logo_url || 'https://placehold.co/600x400'}" class="card-image">
-                        ${badge}
-                    </a>
-                    <div class="p-3 flex flex-col flex-grow">
-                        <span class="text-[9px] font-bold text-gray-500 uppercase bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 w-fit mb-1">${store.categoria}</span>
-                        <h3 class="text-base font-bold text-gray-900 leading-tight mb-1 truncate">${store.nome_fantasia}</h3>
-                        <div class="mt-auto pt-2 border-t border-gray-50 w-full">
-                            ${botoesRodape}
-                        </div>
-                    </div>
-                </div>`;
+                grid.innerHTML += `<div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all ${borderClass} group h-full flex flex-col relative"><a href="perfil.html?id=${store.id}" class="block card-image-wrapper relative"><img src="${store.logo_url || 'https://placehold.co/600x400'}" class="card-image">${badge}</a><div class="p-3 flex flex-col flex-grow"><span class="text-[9px] font-bold text-gray-500 uppercase bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 w-fit mb-1">${store.categoria}</span><h3 class="text-base font-bold text-gray-900 leading-tight mb-1 truncate">${store.nome_fantasia}</h3><div class="mt-auto pt-2 border-t border-gray-50 w-full">${botoesRodape}</div></div></div>`;
             });
             lucide.createIcons();
         }
-
         window.filtrar = (cat) => cat === 'Todos' ? renderStores(allStores) : renderStores(allStores.filter(s => s.categoria === cat));
         document.getElementById('searchInput').addEventListener('input', (e) => renderStores(allStores.filter(s => s.nome_fantasia.toLowerCase().includes(e.target.value.toLowerCase()))));
         iniciar();
