@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SierAdmin Pro - Gestão Completa</title>
+    <title>SierAdmin - Gestão</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,281 +11,218 @@
     <style>
         .aba-ativa { border-bottom: 2px solid #0066FF; color: #0066FF; font-weight: bold; } 
         .aba-inativa { color: #666; cursor: pointer; }
-        .card-kpi { @apply bg-white p-5 rounded-xl shadow-sm border border-gray-100; }
-        /* Scroll suave */
-        html { scroll-behavior: smooth; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+<body class="bg-gray-100 min-h-screen font-sans">
 
     <div id="telaLogin" class="fixed inset-0 bg-gray-900 z-[60] flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <div class="mb-4 bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto animate-pulse">
-                <i data-lucide="shield-check" class="w-8 h-8 text-blue-600"></i>
-            </div>
-            <h1 class="text-2xl font-bold mb-1 text-gray-800">SierAdmin</h1>
-            <p class="text-xs text-gray-500 mb-6 uppercase tracking-widest">Acesso Restrito</p>
-            <input type="password" id="senhaInput" placeholder="Digite sua senha..." class="w-full p-3 border rounded-lg mb-4 text-center bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="fazerLogin()" id="btnLogin" class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-bold transition transform active:scale-95">ACESSAR SISTEMA</button>
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">SierAdmin</h1>
+            <input type="password" id="senhaInput" placeholder="Senha Mestra" class="w-full p-3 border rounded-lg mb-4 text-center">
+            <button onclick="fazerLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">ENTRAR</button>
         </div>
     </div>
 
     <div id="painelAdmin" class="hidden">
-        
-        <header class="bg-white border-b sticky top-0 z-40 shadow-sm">
+        <header class="bg-white border-b sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center overflow-x-auto">
-                <div class="flex items-center gap-2 mr-6">
-                    <div class="bg-blue-600 text-white p-1.5 rounded-lg"><i data-lucide="layout-dashboard" class="w-5 h-5"></i></div>
-                    <h1 class="font-bold text-lg hidden md:block">Sier<span class="text-blue-600">Admin</span></h1>
-                </div>
-                
-                <nav class="flex gap-6 h-full items-center whitespace-nowrap">
-                    <button onclick="mudarAba('dashboard')" id="tab-dashboard" class="aba-ativa h-full text-xs md:text-sm flex items-center gap-1"><i data-lucide="pie-chart" class="w-4 h-4"></i> Visão Geral</button>
-                    <button onclick="mudarAba('lojas')" id="tab-lojas" class="aba-inativa h-full text-xs md:text-sm flex items-center gap-1"><i data-lucide="store" class="w-4 h-4"></i> Lojas</button>
-                    <button onclick="mudarAba('marketing')" id="tab-marketing" class="aba-inativa h-full text-xs md:text-sm flex items-center gap-1 text-purple-600"><i data-lucide="megaphone" class="w-4 h-4"></i> Ads & Banners</button>
-                    <button onclick="mudarAba('relatorios')" id="tab-relatorios" class="aba-inativa h-full text-xs md:text-sm flex items-center gap-1"><i data-lucide="file-text" class="w-4 h-4"></i> Financeiro</button>
-                    <button onclick="mudarAba('config')" id="tab-config" class="aba-inativa h-full text-xs md:text-sm flex items-center gap-1 text-orange-600 font-bold"><i data-lucide="settings" class="w-4 h-4"></i> Config</button>
+                <h1 class="font-bold text-lg mr-4">Sier<span class="text-blue-600">Admin</span></h1>
+                <nav class="flex gap-4 h-full items-center whitespace-nowrap">
+                    <button onclick="mudarAba('dashboard')" id="tab-dashboard" class="aba-ativa h-full text-xs md:text-sm">Dashboard</button>
+                    <button onclick="mudarAba('lojas')" id="tab-lojas" class="aba-inativa h-full text-xs md:text-sm">Lojas</button>
+                    <button onclick="mudarAba('marketing')" id="tab-marketing" class="aba-inativa h-full text-xs md:text-sm text-purple-600">Ads</button>
+                    <button onclick="mudarAba('relatorios')" id="tab-relatorios" class="aba-inativa h-full text-xs md:text-sm">Financeiro</button>
+                    <button onclick="mudarAba('config')" id="tab-config" class="aba-inativa h-full text-xs md:text-sm text-orange-600">Config</button>
                 </nav>
-
-                <button onclick="location.reload()" class="ml-4 text-red-500 p-2 hover:bg-red-50 rounded-full transition" title="Sair"><i data-lucide="power" class="w-5 h-5"></i></button>
+                <button onclick="location.reload()" class="text-red-500 p-2 ml-2"><i data-lucide="power" class="w-5 h-5"></i></button>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 pb-20">
             
-            <div id="view-dashboard" class="space-y-6 animate-fade-in">
+            <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="card-kpi">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Faturamento (Mês)</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-gray-800" id="kpi-faturamento">R$ 0,00</h3>
-                    </div>
-                    <div class="card-kpi">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Total de Lojas</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-gray-800" id="kpi-lojas">0</h3>
-                    </div>
-                    <div class="card-kpi border-l-4 border-l-yellow-400">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Lojas PRO</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-yellow-600" id="kpi-pro">0</h3>
-                    </div>
-                    <div class="card-kpi border-l-4 border-l-purple-500">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Banners Ativos</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-purple-600" id="kpi-banners">0</h3>
-                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-400 font-bold">FATURAMENTO</p><h3 class="text-2xl font-black text-gray-800" id="kpi-faturamento">R$ 0,00</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-400 font-bold">LOJAS</p><h3 class="text-2xl font-black text-gray-800" id="kpi-lojas">0</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-400"><p class="text-xs text-gray-400 font-bold">PRO</p><h3 class="text-2xl font-black text-yellow-600" id="kpi-pro">0</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500"><p class="text-xs text-gray-400 font-bold">BANNERS</p><h3 class="text-2xl font-black text-purple-600" id="kpi-banners">0</h3></div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-gray-800 mb-1 flex items-center gap-2"><i data-lucide="mouse-pointer" class="w-4 h-4 text-blue-500"></i> Segmentos Mais Buscados</h3>
-                        <p class="text-xs text-gray-400 mb-4">Cliques no botão WhatsApp</p>
-                        <canvas id="chartSegmentos"></canvas>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-gray-800 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-purple-500"></i> Origem dos Banners</h3>
-                        <p class="text-xs text-gray-400 mb-4">Automático vs Manual</p>
-                        <div class="h-64 flex justify-center"><canvas id="chartBanners"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 col-span-1 md:col-span-2">
-                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-green-500"></i> Lojas por Estado</h3>
-                        <canvas id="chartEstados" height="80"></canvas>
-                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><h3 class="font-bold mb-2 text-sm">Cliques por Segmento (WhatsApp)</h3><canvas id="chartSegmentos"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><h3 class="font-bold mb-2 text-sm">Origem Banners</h3><div class="h-48 flex justify-center"><canvas id="chartBanners"></canvas></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm md:col-span-2"><h3 class="font-bold mb-2 text-sm">Lojas por Estado</h3><canvas id="chartEstados" height="80"></canvas></div>
                 </div>
             </div>
 
-            <div id="view-lojas" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-700">Parceiros Cadastrados</h3>
-                    <button onclick="carregarDados()" class="text-blue-600 text-xs font-bold hover:underline">Atualizar</button>
-                </div>
+            <div id="view-lojas" class="hidden bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div class="p-4 border-b bg-gray-50 flex justify-between"><h3 class="font-bold">Lojas</h3><button onclick="carregarDados()" class="text-blue-600 text-xs font-bold">Atualizar</button></div>
                 <div id="listaLojas" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto"></div>
             </div>
 
             <div id="view-marketing" class="hidden space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
-                    <div class="p-4 bg-orange-50 font-bold text-orange-800 flex items-center gap-2">
-                        <i data-lucide="clock" class="w-4 h-4"></i> Pedidos Pendentes (Aguardando Aprovação)
-                    </div>
+                    <div class="p-4 bg-orange-50 font-bold text-orange-800 flex gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Pendentes</div>
                     <div id="listaPendentes" class="divide-y divide-orange-100"></div>
                 </div>
-
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 bg-gray-50 font-bold text-gray-700">Banners no Ar</div>
+                    <div class="p-4 bg-gray-50 font-bold text-gray-700">Ativos</div>
                     <div id="listaAtivos" class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4"></div>
                 </div>
-
-                <div class="bg-white p-6 rounded-xl border border-gray-200">
-                    <h3 class="font-bold text-gray-500 text-sm mb-4 flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Adicionar Banner Manualmente</h3>
+                <div class="bg-white p-6 rounded-xl border">
+                    <h3 class="font-bold text-gray-500 text-sm mb-4">Upload Manual</h3>
                     <div class="flex flex-col md:flex-row gap-2 items-end">
-                        <div class="w-full"><label class="text-[10px] uppercase font-bold text-gray-400">Imagem</label><input type="file" id="bannerFile" class="text-xs w-full bg-gray-50 p-2 rounded border"></div>
-                        <div class="w-full"><label class="text-[10px] uppercase font-bold text-gray-400">Link Destino</label><input type="text" id="bannerLink" placeholder="https://..." class="text-xs w-full p-2 rounded border"></div>
-                        <div class="w-32"><label class="text-[10px] uppercase font-bold text-gray-400">Dias</label><input type="number" id="manualDias" value="30" class="text-xs w-full p-2 rounded border text-center font-bold"></div>
-                        <button onclick="uploadManual()" class="bg-gray-800 hover:bg-black text-white px-6 py-2 rounded text-xs font-bold h-[34px]">ENVIAR</button>
+                        <div class="w-full"><label class="text-[10px] font-bold">IMAGEM</label><input type="file" id="bannerFile" class="text-xs w-full bg-gray-50 p-2 rounded border"></div>
+                        <div class="w-full"><label class="text-[10px] font-bold">LINK</label><input type="text" id="bannerLink" placeholder="https://..." class="text-xs w-full p-2 rounded border"></div>
+                        <div class="w-32"><label class="text-[10px] font-bold">DIAS</label><input type="number" id="manualDias" value="30" class="text-xs w-full p-2 rounded border text-center font-bold"></div>
+                        <button onclick="uploadManual()" class="bg-gray-800 text-white px-6 py-2 rounded text-xs font-bold h-[34px]">ENVIAR</button>
                     </div>
                 </div>
             </div>
 
             <div id="view-relatorios" class="hidden space-y-6">
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <i data-lucide="file-spreadsheet" class="w-12 h-12 text-green-600 mx-auto mb-3"></i>
+                <div class="bg-white p-8 rounded-xl shadow-sm border text-center">
                     <h2 class="text-2xl font-bold text-gray-800">Relatório Financeiro</h2>
-                    <p class="text-gray-500 text-sm mb-6">Resumo contábil consolidado.</p>
-                    
-                    <div class="overflow-x-auto border rounded-lg">
+                    <div class="overflow-x-auto border rounded-lg mt-4">
                         <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr><th class="px-6 py-3">Descrição</th><th class="px-6 py-3">Qtd</th><th class="px-6 py-3">Ticket Médio</th><th class="px-6 py-3 text-right">Total Bruto</th></tr>
-                            </thead>
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">Item</th><th class="px-6 py-3">Qtd</th><th class="px-6 py-3 text-right">Total</th></tr></thead>
                             <tbody id="tabelaFinanceira"></tbody>
-                            <tfoot class="font-bold text-gray-900 bg-gray-100">
-                                <tr><td class="px-6 py-3">TOTAL GERAL</td><td class="px-6 py-3">-</td><td class="px-6 py-3">-</td><td class="px-6 py-3 text-right text-lg text-green-600" id="totalGeralRelatorio">R$ 0,00</td></tr>
-                            </tfoot>
+                            <tfoot class="font-bold text-gray-900 bg-gray-100"><tr><td class="px-6 py-3">TOTAL</td><td class="px-6 py-3">-</td><td class="px-6 py-3 text-right text-lg text-green-600" id="totalGeralRelatorio">R$ 0,00</td></tr></tfoot>
                         </table>
                     </div>
-                    <button onclick="window.print()" class="mt-6 bg-gray-800 text-white px-6 py-2 rounded-lg font-bold text-xs hover:bg-black transition flex mx-auto gap-2 items-center"><i data-lucide="printer" class="w-4 h-4"></i> IMPRIMIR / PDF</button>
+                    <button onclick="window.print()" class="mt-6 bg-gray-800 text-white px-6 py-2 rounded-lg font-bold text-xs">IMPRIMIR</button>
                 </div>
             </div>
 
             <div id="view-config" class="hidden space-y-6">
                 <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white flex justify-between items-center shadow-lg">
-                    <div>
-                        <h3 class="font-bold text-lg flex items-center gap-2"><i data-lucide="rocket" class="w-5 h-5"></i> Upsell Automático</h3>
-                        <p class="text-xs text-purple-200 mt-1">Oferta de banner extra no checkout do Plano PRO.</p>
-                    </div>
-                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-bold text-xs shadow hover:bg-purple-50 transition">Carregando...</button>
+                    <div><h3 class="font-bold text-lg">Upsell Automático</h3><p class="text-xs text-purple-200">Oferta banner no checkout PRO.</p></div>
+                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-bold text-xs shadow">Carregando...</button>
                 </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 mb-4">Tabela de Preços (Checkout)</h3>
+                <div class="bg-white p-6 rounded-xl shadow-sm border">
+                    <h3 class="font-bold text-gray-800 mb-4">Tabela de Preços</h3>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-xs font-bold text-gray-400">PLANO PRO</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold text-gray-800"></div>
-                        <div><label class="text-xs font-bold text-gray-400">BANNER 7 DIAS</label><input type="number" id="price_7d" step="0.01" class="w-full border-b p-2 font-bold text-gray-800"></div>
-                        <div><label class="text-xs font-bold text-gray-400">BANNER 14 DIAS</label><input type="number" id="price_14d" step="0.01" class="w-full border-b p-2 font-bold text-gray-800"></div>
-                        <div><label class="text-xs font-bold text-gray-400">BANNER 30 DIAS</label><input type="number" id="price_30d" step="0.01" class="w-full border-b p-2 font-bold text-gray-800"></div>
+                        <div><label class="text-xs font-bold text-gray-400">PLANO PRO</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold"></div>
+                        <div><label class="text-xs font-bold text-gray-400">BANNER 7D</label><input type="number" id="price_7d" step="0.01" class="w-full border-b p-2 font-bold"></div>
+                        <div><label class="text-xs font-bold text-gray-400">BANNER 14D</label><input type="number" id="price_14d" step="0.01" class="w-full border-b p-2 font-bold"></div>
+                        <div><label class="text-xs font-bold text-gray-400">BANNER 30D</label><input type="number" id="price_30d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                     </div>
-                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold hover:bg-blue-700">SALVAR PREÇOS</button>
+                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold">SALVAR PREÇOS</button>
                 </div>
             </div>
-
         </main>
     </div>
 
     <script>
         lucide.createIcons();
-        
-        // ⚠️ COLE SUAS CHAVES AQUI
+        // ⚠️ SUAS CHAVES
         const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
         const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
         const client = supabase.createClient(URL_API, KEY_API);
 
-        let dados = { lojas: [], banners: [], clicks: [], precos: [] };
-        let charts = {};
-        let upsellAtivo = true;
+        let dados={lojas:[],banners:[],clicks:[],precos:[]}, charts={}, upsellAtivo=true;
 
-        // --- LOGIN ---
         async function fazerLogin() {
             const btn = document.getElementById('btnLogin');
             const pass = document.getElementById('senhaInput').value;
             btn.innerText = "Verificando..."; btn.disabled = true;
-
             try {
                 const { data } = await client.from('admin_auth').select('*').eq('senha_hash', pass).single();
-                if (data || pass === "sier2026") { // Fallback se banco falhar
+                if (data || pass === "sier2026") {
                     document.getElementById('telaLogin').classList.add('hidden');
                     document.getElementById('painelAdmin').classList.remove('hidden');
                     carregarDados();
-                } else {
-                    alert("Senha incorreta.");
-                    btn.innerText = "ACESSAR SISTEMA"; btn.disabled = false;
-                }
-            } catch (e) {
-                if(pass==="sier2026") { 
-                    document.getElementById('telaLogin').classList.add('hidden');
-                    document.getElementById('painelAdmin').classList.remove('hidden');
-                    carregarDados();
-                } else { alert("Erro de conexão."); btn.disabled = false; }
+                } else { alert("Senha incorreta."); btn.innerText="ENTRAR"; btn.disabled=false; }
+            } catch(e) { 
+                if(pass==="sier2026"){ document.getElementById('telaLogin').classList.add('hidden'); document.getElementById('painelAdmin').classList.remove('hidden'); carregarDados(); }
+                else { alert("Erro conexão."); btn.innerText="ENTRAR"; btn.disabled=false; }
             }
         }
 
         window.mudarAba = (aba) => {
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.className = 'aba-inativa h-full text-xs md:text-sm flex items-center gap-1');
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.className = 'aba-inativa h-full text-xs md:text-sm');
             document.getElementById(`view-${aba}`).classList.remove('hidden');
-            const tab = document.getElementById(`tab-${aba}`);
-            tab.className = `aba-ativa h-full text-xs md:text-sm flex items-center gap-1 ${aba==='config'?'text-orange-600':(aba==='marketing'?'text-purple-600':'')}`;
+            document.getElementById(`tab-${aba}`).className = `aba-ativa h-full text-xs md:text-sm ${aba==='config'?'text-orange-600':''}`;
         }
 
-        // --- CARREGAMENTO GLOBAL ---
         async function carregarDados() {
-            const [lojasRes, bannersRes, clicksRes, precosRes, configRes] = await Promise.all([
-                client.from('lojas').select('*').order('created_at', {ascending: false}),
-                client.from('banners').select('*').order('created_at', {ascending: false}),
+            const [l, b, c, p, cfg] = await Promise.all([
+                client.from('lojas').select('*').order('created_at',{ascending:false}),
+                client.from('banners').select('*').order('created_at',{ascending:false}),
                 client.from('clicks').select('*'),
                 client.from('precos').select('*'),
-                client.from('config').select('ativo').eq('chave', 'upsell_banner').single()
+                client.from('config').select('ativo').eq('chave','upsell_banner').single()
             ]);
+            dados.lojas=l.data||[]; dados.banners=b.data||[]; dados.clicks=c.data||[]; dados.precos=p.data||[];
+            if(cfg.data) upsellAtivo=cfg.data.ativo;
 
-            dados.lojas = lojasRes.data || [];
-            dados.banners = bannersRes.data || [];
-            dados.clicks = clicksRes.data || [];
-            dados.precos = precosRes.data || [];
-            upsellAtivo = configRes.data ? configRes.data.ativo : true;
-
-            atualizarDashboard();
-            renderMarketing(); // Voltou!
-            renderLojas();
-            renderRelatorio();
-            preencherConfig();
-            renderBtnUpsell();
+            attDash(); renderMarketing(); renderLojas(); renderRelatorio(); preencherConfig(); renderBtnUpsell();
         }
 
-        // --- DASHBOARD ---
-        function actualizarDashboard() {
-            const totalPro = dados.lojas.filter(l => l.plano === 'pro').length;
-            const bannersAtivos = dados.banners.filter(b => b.status === 'ativo').length;
-            const precoPro = getPreco('plano_pro');
+        function getPreco(k) { const x=dados.precos.find(i=>i.chave===k); return x?parseFloat(x.valor):0; }
+
+        function attDash() {
+            const pros = dados.lojas.filter(l=>l.plano==='pro').length;
+            const bannersOn = dados.banners.filter(b=>b.status==='ativo').length;
+            const fat = (pros*getPreco('plano_pro')) + (bannersOn*getPreco('banner_30d'));
             
             document.getElementById('kpi-lojas').innerText = dados.lojas.length;
-            document.getElementById('kpi-pro').innerText = totalPro;
-            document.getElementById('kpi-banners').innerText = bannersAtivos;
-            
-            const faturamento = (totalPro * precoPro) + (bannersAtivos * getPreco('banner_30d')); 
-            document.getElementById('kpi-faturamento').innerText = faturamento.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            document.getElementById('kpi-pro').innerText = pros;
+            document.getElementById('kpi-banners').innerText = bannersOn;
+            document.getElementById('kpi-faturamento').innerText = fat.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
-            const clicksPorSeg = {}; dados.clicks.forEach(c => { clicksPorSeg[c.segmento] = (clicksPorSeg[c.segmento] || 0) + 1; });
-            renderChart('chartSegmentos', 'bar', Object.keys(clicksPorSeg), Object.values(clicksPorSeg), '#3B82F6', 'Cliques');
+            const clicksSeg={}; dados.clicks.forEach(c=>{clicksSeg[c.segmento]=(clicksSeg[c.segmento]||0)+1});
+            renderChart('chartSegmentos','bar',Object.keys(clicksSeg),Object.values(clicksSeg),'#3B82F6','Cliques');
 
-            const bannerAuto = dados.banners.filter(b => b.nome_cliente !== 'Manual').length;
-            const bannerManual = dados.banners.filter(b => b.nome_cliente === 'Manual').length;
-            renderChart('chartBanners', 'doughnut', ['Site', 'Manual'], [bannerAuto, bannerManual], ['#8B5CF6', '#10B981'], 'Banners');
+            const bAuto=dados.banners.filter(b=>b.nome_cliente!=='Manual').length, bMan=dados.banners.filter(b=>b.nome_cliente==='Manual').length;
+            renderChart('chartBanners','doughnut',['Site','Manual'],[bAuto,bMan],['#8B5CF6','#10B981'],'Banners');
 
-            const lojasPorEstado = {}; dados.lojas.forEach(l => { lojasPorEstado[l.estado || 'ND'] = (lojasPorEstado[l.estado || 'ND'] || 0) + 1; });
-            renderChart('chartEstados', 'bar', Object.keys(lojasPorEstado), Object.values(lojasPorEstado), '#10B981', 'Lojas');
+            const lojasEst={}; dados.lojas.forEach(l=>{lojasEst[l.estado||'ND']=(lojasEst[l.estado||'ND']||0)+1});
+            renderChart('chartEstados','bar',Object.keys(lojasEst),Object.values(lojasEst),'#10B981','Lojas');
         }
 
-        function renderChart(id, type, labels, data, color, label) {
+        function renderChart(id,type,lbl,dat,cor,tit) {
             if(charts[id]) charts[id].destroy();
-            const ctx = document.getElementById(id).getContext('2d');
-            charts[id] = new Chart(ctx, {
-                type: type,
-                data: { labels: labels, datasets: [{ label: label, data: data, backgroundColor: color, borderRadius: 5 }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            charts[id]=new Chart(document.getElementById(id),{type:type,data:{labels:lbl,datasets:[{label:tit,data:dat,backgroundColor:cor,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false}});
         }
 
-        // --- MARKETING (GERENCIAR BANNERS) ---
         function renderMarketing() {
-            const pendentes = dados.banners.filter(b => b.status === 'pendente');
-            const ativos = dados.banners.filter(b => b.status === 'ativo');
-            
-            const divPen = document.getElementById('listaPendentes');
-            if(pendentes.length===0) divPen.innerHTML = '<p class="p-4 text-sm text-gray-400">Nenhum pedido novo.</p>';
-            else divPen.innerHTML = pendentes.map(b => `
-                <div class="p-4 flex flex-col md:flex-row gap-4 items-center bg-white hover:bg-orange-50 transition border-b">
-                    <img src="${b.imagem_url}" class="w-32 h-16 object-cover rounded border cursor-pointer" onclick="window.open(this.src)">
-                    <div class="flex-grow text-center md:text-left">
-                        <p class="font-bold text-gray-800 text-sm">${b.nome_cliente}</p>
-                        <p class="text-xs text-gray-500">Plano: ${b.plano_dias} Dias | Zap: ${b.telefone_cliente}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="aprovarBanner('${b.id}', ${b.plano_dias})" class="bg-green-500 text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-green-600">APROVAR</button>
-                        <button onclick="deletarBanner('${b.id}')" class="bg-red-100 text-red-500 px-3 py-2 rounded font-bold text-xs hov
+            const pen=dados.banners.filter(b=>b.status==='pendente');
+            const elP=document.getElementById('listaPendentes');
+            if(pen.length===0) elP.innerHTML='<p class="p-4 text-gray-400 text-xs">Nada pendente.</p>';
+            else elP.innerHTML=pen.map(b=>`<div class="p-4 border-b flex items-center gap-4"><img src="${b.imagem_url}" class="w-16 h-8 rounded object-cover cursor-pointer" onclick="window.open(this.src)"><div class="flex-1"><p class="font-bold text-sm">${b.nome_cliente}</p><p class="text-xs text-gray-500">${b.plano_dias}d | ${b.telefone_cliente}</p></div><div class="flex gap-2"><button onclick="aprovBan('${b.id}',${b.plano_dias})" class="bg-green-500 text-white px-3 py-1 rounded text-xs">V</button><button onclick="delBan('${b.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs">X</button></div></div>`).join('');
 
+            const atv=dados.banners.filter(b=>b.status==='ativo');
+            document.getElementById('listaAtivos').innerHTML=atv.map(b=>`<div class="border rounded p-2 relative"><img src="${b.imagem_url}" class="w-full h-24 object-cover rounded"><div class="absolute top-1 right-1"><button onclick="delBan('${b.id}')" class="bg-red-600 text-white p-1 rounded text-[10px]">X</button></div><p class="text-xs font-bold mt-1 truncate">${b.nome_cliente}</p></div>`).join('');
+        }
+
+        async function aprovBan(id,d) { if(!confirm('Aprovar?'))return; const h=new Date(); h.setDate(h.getDate()+(d||30)); await client.from('banners').update({status:'ativo',data_expiracao:h}).eq('id',id); carregarDados(); }
+        async function delBan(id) { if(confirm('Excluir?')) { await client.from('banners').delete().eq('id',id); carregarDados(); }}
+        async function uploadManual() {
+            const f=document.getElementById('bannerFile').files[0]; if(!f)return alert('Foto?');
+            const {data}=await client.storage.from('sier-images').upload(`man_${Date.now()}.jpg`,f);
+            const {data:url}=client.storage.from('sier-images').getPublicUrl(data.path);
+            const fim=new Date(); fim.setDate(fim.getDate()+parseInt(document.getElementById('manualDias').value));
+            await client.from('banners').insert([{imagem_url:url.publicUrl,link_destino:document.getElementById('bannerLink').value,status:'ativo',nome_cliente:'Manual',data_expiracao:fim}]);
+            alert('Enviado!'); carregarDados();
+        }
+
+        function renderRelatorio() {
+            const pPro=getPreco('plano_pro'), qPro=dados.lojas.filter(l=>l.plano==='pro').length, tPro=qPro*pPro;
+            const qBan=dados.banners.filter(b=>b.status==='ativo').length, tBan=qBan*getPreco('banner_30d'); // Estimativa
+            document.getElementById('tabelaFinanceira').innerHTML=`<tr class="bg-white border-b"><td class="px-6 py-4">PRO</td><td class="px-6 py-4">${qPro}</td><td class="px-6 py-4 text-right">R$ ${tPro.toFixed(2)}</td></tr><tr class="bg-white border-b"><td class="px-6 py-4">Ads</td><td class="px-6 py-4">${qBan}</td><td class="px-6 py-4 text-right">R$ ${tBan.toFixed(2)}</td></tr>`;
+            document.getElementById('totalGeralRelatorio').innerText=(tPro+tBan).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+        }
+
+        function preencherConfig(){ if(dados.precos.length){ document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); } }
+        async function salvarPrecos() { const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; for(const x of u) await client.from('precos').upsert(x); alert('Salvo!'); carregarDados(); }
+        
+        function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";} }
+        async function toggleUpsell(){ upsellAtivo=!upsellAtivo; await client.from('config').upsert({chave:'upsell_banner',ativo:upsellAtivo}); renderBtnUpsell(); }
+
+        function renderLojas(){ document.getElementById('listaLojas').innerHTML=dados.lojas.map(l=>`<div class="p-4 flex justify-between items-center hover:bg-gray-50 border-b"><div class="flex gap-3 items-center"><img src="${l.logo_url}" class="w-8 h-8 rounded object-cover"><p class="text-sm font-bold">${l.nome_fantasia}</p></div><div class="flex gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${l.plano==='pro'?'bg-yellow-100 text-yellow-800':'bg-gray-100'}">${l.plano.toUpperCase()}</span><button onclick="mudarPlano('${l.id}','${l.plano==='pro'?'gratis':'pro'}')" class="text-blue-500 text-xs border px-2 rounded">Mudar</button><button onclick="apagarLoja('${l.id}')" class="text-red-500 text-xs">X</button></div></div>`).join(''); }
+        async function mudarPlano(id,n){ if(confirm('Mudar?')) {await client.from('lojas').update({plano:n}).eq('id',id); carregarDados();} }
+        async function apagarLoja(id){ if(confirm('Apagar?')) {await client.from('lojas').delete().eq('id',id); carregarDados();} }
+    </script>
+</body>
+</html>
