@@ -132,7 +132,7 @@
                 let botoesRodape = '';
                 if(isPro) {
                     // PRO: Link direto do WhatsApp
-                    botoesRodape = `<a href="https://wa.me/55${store.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-whatsapp hover:bg-green-600 py-2 rounded-lg transition w-full shadow-sm"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>`;
+                    botoesRodape = `<a href="https://wa.me/55${store.whatsapp.replace(/\D/g,'')}" target="_blank" onclick="registrarClick('${store.id}', '${store.categoria}', 'whatsapp')" ...</a>`;
                 } else {
                     // GRÁTIS: Ver Perfil + Link para Virar PRO
                     botoesRodape = `
@@ -186,3 +186,4 @@
    
 
       
+
