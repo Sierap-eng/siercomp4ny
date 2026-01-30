@@ -10,13 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .btn-disabled { 
-            background-color: #f3f4f6 !important; 
+        .btn-bloqueado { 
+            background: #f3f4f6 !important; 
             color: #9ca3af !important; 
             border: 1px solid #e5e7eb !important;
             cursor: not-allowed !important; 
             pointer-events: none !important;
             box-shadow: none !important;
+            background-image: none !important;
         }
     </style>
 </head>
@@ -25,9 +26,7 @@
     <header class="bg-[#111111] sticky top-0 z-50 shadow-md border-b border-gray-800">
         <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold text-white tracking-tighter">SIER<span class="text-[#0066FF]">COMP4NY</span></h1>
-            <a href="index.html" class="text-gray-400 text-sm border border-gray-700 px-4 py-1.5 rounded-full hover:text-white hover:border-white transition">
-                Voltar
-            </a>
+            <a href="index.html" class="text-gray-400 text-sm border border-gray-700 px-4 py-1.5 rounded-full hover:text-white hover:border-white transition">Voltar</a>
         </div>
     </header>
 
@@ -43,30 +42,18 @@
                 <p id="txtDescricao" class="text-gray-600 text-sm leading-relaxed"></p>
 
                 <div id="areaUpgrade" class="hidden mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                    <p class="text-yellow-800 font-bold text-sm mb-1 flex items-center justify-center gap-2">
-                        <i data-lucide="lock" class="w-4 h-4"></i> Recursos Bloqueados
-                    </p>
+                    <p class="text-yellow-800 font-bold text-sm mb-1 flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Recursos Bloqueados</p>
                     <p class="text-xs text-gray-600 mb-3">Esta loja está no plano Grátis.</p>
-                    <a href="assinar-pro.html" class="block w-full bg-[#D4AF37] text-white font-bold py-3 rounded-lg hover:bg-[#b5952f] transition shadow-md text-sm">
-                        QUERO VIRAR PARCEIRO PRO ⚡
-                    </a>
+                    <a href="assinar-pro.html" class="block w-full bg-[#D4AF37] text-white font-bold py-3 rounded-lg hover:bg-[#b5952f] transition shadow-md text-sm">QUERO VIRAR PARCEIRO PRO ⚡</a>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-6">
-            <a id="btnZap" href="#" class="flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white transition shadow-sm bg-[#25D366] hover:bg-green-600">
-                <i data-lucide="message-circle" class="w-5 h-5"></i> WhatsApp
-            </a>
-            <a id="btnInsta" href="#" target="_blank" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:opacity-90 transition">
-                <i data-lucide="instagram" class="w-5 h-5"></i> Instagram
-            </a>
-            <a id="btnSite" href="#" target="_blank" class="bg-blue-600 text-white col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hidden hover:bg-blue-700 transition">
-                <i data-lucide="globe" class="w-5 h-5"></i> Visitar Site
-            </a>
-            <a id="btnMapa" href="#" target="_blank" class="bg-white text-gray-700 border border-gray-200 col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:bg-gray-50 transition">
-                <i data-lucide="map-pin" class="w-5 h-5"></i> Ver Endereço no Mapa
-            </a>
+            <a id="btnZap" href="#" class="flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white transition shadow-sm bg-[#25D366] hover:bg-green-600"><i data-lucide="message-circle" class="w-5 h-5"></i> WhatsApp</a>
+            <a id="btnInsta" href="#" target="_blank" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:opacity-90 transition"><i data-lucide="instagram" class="w-5 h-5"></i> Instagram</a>
+            <a id="btnSite" href="#" target="_blank" class="bg-blue-600 text-white col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hidden hover:bg-blue-700 transition"><i data-lucide="globe" class="w-5 h-5"></i> Visitar Site</a>
+            <a id="btnMapa" href="#" target="_blank" class="bg-white text-gray-700 border border-gray-200 col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold shadow-sm hover:bg-gray-50 transition"><i data-lucide="map-pin" class="w-5 h-5"></i> Ver Endereço no Mapa</a>
         </div>
 
         <div id="areaGaleria" class="hidden">
@@ -81,7 +68,7 @@
 
     <footer class="bg-black py-8 border-t border-gray-900 mt-auto text-center">
         <p class="text-gray-500 text-sm mb-1">Tecnologia <span class="text-[#FF6600] font-bold">Sier Growth</span></p>
-        <p class="text-[10px] text-gray-600">Todos os direitos reservados &copy; 2026</p>
+        <p class="text-[10px] text-gray-600">Todos os direitos reservados © 2026</p>
     </footer>
 
     <script>
@@ -93,11 +80,15 @@
         
         const client = supabase.createClient(URL_API, KEY_API);
 
+        // --- FUNÇÃO DE RASTREAMENTO ADICIONADA ---
+        window.registrarClick = async function(lojaId, segmento, tipo) {
+            try { await client.from('clicks').insert([{ loja_id: lojaId, segmento: segmento, tipo: tipo }]); } catch(e) {}
+        }
+
         async function carregar() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-
-            if(!id) { alert("Loja não encontrada."); return window.location.href = 'Vitrine.html'; }
+            if(!id) { window.location.href = 'index.html'; return; }
 
             try {
                 const { data: loja, error } = await client.from('lojas').select('*').eq('id', id).single();
@@ -111,26 +102,42 @@
                 document.getElementById('txtCategoria').innerText = loja.categoria;
                 document.getElementById('txtDescricao').innerText = loja.descricao;
 
-                // --- LÓGICA DE BLOQUEIO TOTAL ---
                 if (loja.plano === 'gratis') {
                     document.getElementById('areaUpgrade').classList.remove('hidden');
-                    
-                    // Bloqueia Zap
-                    bloquearBotao('btnZap', 'WhatsApp');
-                    // Bloqueia Insta (NOVIDADE)
-                    bloquearBotao('btnInsta', 'Instagram');
-                    // Bloqueia Site (NOVIDADE)
-                    bloquearBotao('btnSite', 'Site');
-                    // Bloqueia Mapa
-                    bloquearBotao('btnMapa', 'Endereço Bloqueado');
+                    const travar = (idBtn, texto, full=false) => {
+                        const btn = document.getElementById(idBtn);
+                        if(btn) {
+                            btn.className = `flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold btn-bloqueado ${full?'col-span-2':''}`;
+                            btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> ${texto}`;
+                            btn.removeAttribute('href'); btn.removeAttribute('target');
+                        }
+                    };
+                    travar('btnZap', 'WhatsApp Bloqueado');
+                    travar('btnInsta', 'Instagram Bloqueado');
+                    travar('btnSite', 'Site Bloqueado', true);
+                    travar('btnMapa', 'Endereço Bloqueado', true);
+                    document.getElementById('btnSite').classList.remove('hidden');
 
                 } else {
-                    // PRO: Libera tudo
-                    document.getElementById('btnZap').<a href="https://wa.me/55${store.whatsapp.replace(/\D/g,'')}" target="_blank" onclick="registrarClick('${store.id}', '${store.categoria}', 'whatsapp')" ...>'')}`;</a>
+                    // Botão WhatsApp com Tracking
+                    const zapLink = `https://wa.me/55${loja.whatsapp.replace(/\D/g,'')}`;
+                    const btnZap = document.getElementById('btnZap');
+                    btnZap.href = zapLink;
+                    // Adiciona o evento de clique via JS para evitar erro de aspas
+                    btnZap.onclick = function() { registrarClick(loja.id, loja.categoria, 'whatsapp_perfil'); };
                     
                     const enderecoFull = `${loja.endereco}, ${loja.cidade} - ${loja.estado}`;
                     document.getElementById('btnMapa').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoFull)}`;
                     
+                    if(loja.instagram) document.getElementById('btnInsta').href = `https://instagram.com/${loja.instagram.replace('@','').replace('https://instagram.com/','')}`;
+                    else document.getElementById('btnInsta').classList.add('hidden');
+
+                    if(loja.site) {
+                        document.getElementById('btnSite').classList.remove('hidden');
+                        let s = loja.site; if(!s.startsWith('http')) s = 'http://'+s;
+                        document.getElementById('btnSite').href = s;
+                    } else document.getElementById('btnSite').classList.add('hidden');
+
                     if (loja.foto1 || loja.foto2 || loja.foto3) {
                         document.getElementById('areaGaleria').classList.remove('hidden');
                         const grid = document.getElementById('gridFotos');
@@ -138,42 +145,11 @@
                             if(f) grid.innerHTML += `<img src="${f}" class="w-full h-24 object-cover rounded-lg border shadow-sm cursor-pointer hover:opacity-90" onclick="window.open(this.src)">`;
                         });
                     }
-
-                    // Links Externos (Só preenche se for PRO)
-                    if(loja.instagram) {
-                        const instaUser = loja.instagram.replace('@','').replace('https://instagram.com/','');
-                        document.getElementById('btnInsta').href = `https://instagram.com/${instaUser}`;
-                    } else {
-                        document.getElementById('btnInsta').classList.add('hidden');
-                    }
-
-                    if(loja.site) {
-                        document.getElementById('btnSite').classList.remove('hidden');
-                        let s = loja.site; if(!s.startsWith('http')) s = 'http://'+s;
-                        document.getElementById('btnSite').href = s;
-                    }
                 }
                 lucide.createIcons();
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao carregar loja.");
-                window.location.href = 'Vitrine.html';
-            }
+            } catch (err) { console.error(err); alert("Erro ao carregar loja."); window.location.href = 'index.html'; }
         }
-
-        function bloquearBotao(id, texto) {
-            const btn = document.getElementById(id);
-            if(btn) {
-                btn.className = "flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold btn-disabled col-span-2"; // col-span-2 força largura total
-                btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> ${texto}`;
-                btn.href = "#";
-            }
-        }
-
         carregar();
     </script>
 </body>
-
 </html>
-
-
