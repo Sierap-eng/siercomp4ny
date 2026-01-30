@@ -168,8 +168,21 @@
         document.getElementById('searchInput').addEventListener('input', (e) => renderStores(allStores.filter(s => s.nome_fantasia.toLowerCase().includes(e.target.value.toLowerCase()))));
         iniciar();
     </script>
+    <script>
+        async function registrarClick(lojaId, segmento, tipo) {
+            try {
+                await client.from('clicks').insert([{
+                    loja_id: lojaId,
+                    segmento: segmento,
+                    tipo: tipo
+                }]);
+                console.log('Click registrado');
+            } catch(e) { console.error('Erro tracking'); }
+        }
+    </script>
 </body>
 </html>
 
    
+
       
