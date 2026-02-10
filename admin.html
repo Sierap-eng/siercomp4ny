@@ -141,9 +141,7 @@
 
     <script>
         lucide.createIcons();
-        const SENHA_MESTRA = "sier2026";
-        
-        // ⚠️ COLE SUAS CHAVES AQUI
+               // ⚠️ COLE SUAS CHAVES AQUI
         const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
         const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
         const client = supabase.createClient(URL_API, KEY_API);
@@ -155,7 +153,10 @@
             const pass = document.getElementById('senhaInput').value;
             btn.innerText = "Verificando..."; btn.disabled = true;
             try {
+                // AGORA ELE VAI NO BANCO BUSCAR A SENHA
                 const { data } = await client.from('admin_auth').select('*').eq('senha_hash', pass).single();
+                
+                // Se achou no banco OU se for a senha de emergência (temporário)
                 if (data || pass === "sier2026") {
                     document.getElementById('telaLogin').classList.add('hidden');
                     document.getElementById('painelAdmin').classList.remove('hidden');
@@ -215,7 +216,6 @@
             const lojasEst={}; dados.lojas.forEach(l=>{lojasEst[l.estado||'ND']=(lojasEst[l.estado||'ND']||0)+1});
             renderChart('chartEstados','bar',Object.keys(lojasEst),Object.values(lojasEst),'#10B981','Lojas');
 
-            // --- RANKING TOP 5 LOJAS ---
             const clicksPorLoja = {};
             dados.clicks.forEach(c => { 
                 if(c.loja_id) clicksPorLoja[c.loja_id] = (clicksPorLoja[c.loja_id] || 0) + 1; 
@@ -288,16 +288,6 @@
         function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-4 py-2 rounded text-xs font-bold shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-4 py-2 rounded text-xs font-bold shadow";} }
         async function toggleUpsell(){ upsellAtivo=!upsellAtivo; await client.from('config').upsert({chave:'upsell_banner',ativo:upsellAtivo}); renderBtnUpsell(); }
 
-        function renderBtnPromo(){ const b=document.getElementById('btnPromo'); if(promoAtiva){b.innerText="PROMO ATIVA 🚀";b.className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold text-xs shadow animate-pulse";}else{b.innerText="DESLIGADO";b.className="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow";} }
-        async function togglePromo(){ promoAtiva=!promoAtiva; await client.from('config').upsert({chave:'modo_lancamento',ativo:promoAtiva}); renderBtnPromo(); }
-
-        function renderLojas(){ document.getElementById('listaLojas').innerHTML=dados.lojas.map(l=>`<div class="p-4 flex justify-between items-center hover:bg-gray-50 border-b"><div class="flex gap-3 items-center"><img src="${l.logo_url}" class="w-8 h-8 rounded object-cover"><p class="text-sm font-bold">${l.nome_fantasia}</p></div><div class="flex gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${l.plano==='pro'?'bg-yellow-100 text-yellow-800':'bg-gray-100'}">${l.plano.toUpperCase()}</span><button onclick="mudarPlano('${l.id}','${l.plano==='pro'?'gratis':'pro'}')" class="text-blue-500 text-xs border px-2 rounded">Mudar</button><button onclick="apagarLoja('${l.id}')" class="text-red-500 text-xs">X</button></div></div>`).join(''); }
-        async function mudarPlano(id,n){ if(confirm('Mudar?')) {await client.from('lojas').update({plano:n}).eq('id',id); carregarDados();} }
-        async function apagarLoja(id){ if(confirm('Apagar?')) {await client.from('lojas').delete().eq('id',id); carregarDados();} }
-    </script>
-</body>
-</html>
+        function renderBtnPromo(){ const b=document.
 
     
-
-       
