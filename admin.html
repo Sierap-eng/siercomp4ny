@@ -94,19 +94,43 @@
             </div>
 
             <div id="view-config" class="hidden space-y-6">
-                <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white flex justify-between items-center shadow-lg">
-                    <div><h3 class="font-bold text-lg">Upsell Automático</h3><p class="text-xs text-purple-200">Oferta banner no checkout PRO.</p></div>
-                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-bold text-xs shadow">Carregando...</button>
+                
+                <div class="bg-green-50 rounded-xl p-6 border-2 border-green-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-green-900 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5"></i> Motor de Promoções</h3>
+                        <button id="btnPromo" onclick="togglePromo()" class="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow transition">Desativado</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-green-700 uppercase">Título da Campanha</label>
+                            <input type="text" id="promo_titulo" placeholder="Ex: Black Friday" class="w-full p-2 rounded border border-green-300 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-green-700 uppercase">Texto do Desconto (Display)</label>
+                            <input type="text" id="promo_rotulo" placeholder="Ex: 20% OFF ou GRÁTIS" class="w-full p-2 rounded border border-green-300 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-green-700 uppercase">Valor a Cobrar (R$)</label>
+                            <input type="number" id="promo_preco" step="0.01" placeholder="0 para Grátis" class="w-full p-2 rounded border border-green-300 text-sm font-bold">
+                        </div>
+                    </div>
+                    <button onclick="salvarPromo()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded text-xs transition">SALVAR CONFIGURAÇÃO DA PROMOÇÃO</button>
                 </div>
+
                 <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="font-bold text-gray-800 mb-4">Tabela de Preços</h3>
+                    <h3 class="font-bold text-gray-800 mb-4">Tabela de Preços Padrão</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="text-xs font-bold text-gray-400">PLANO PRO</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 7D</label><input type="number" id="price_7d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 14D</label><input type="number" id="price_14d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 30D</label><input type="number" id="price_30d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                     </div>
-                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold">SALVAR PREÇOS</button>
+                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold">SALVAR PREÇOS PADRÃO</button>
+                </div>
+
+                <div class="bg-purple-50 rounded-xl p-4 border border-purple-200 flex justify-between items-center">
+                    <div><h3 class="font-bold text-purple-900 text-sm">Upsell Automático</h3><p class="text-[10px] text-purple-600">Oferecer banner ao finalizar compra.</p></div>
+                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-4 py-2 rounded text-xs font-bold shadow">...</button>
                 </div>
             </div>
         </main>
@@ -114,12 +138,15 @@
 
     <script>
         lucide.createIcons();
-        // ⚠️ SUAS CHAVES
+        const SENHA_MESTRA = "sier2026";
+        
+        // ⚠️ COLE SUAS CHAVES AQUI
         const URL_API = 'https://zjtnlyjrxkwybqesszyd.supabase.co';
         const KEY_API = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdG5seWpyeGt3eWJxZXNzenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NzAwNDQsImV4cCI6MjA4NTE0NjA0NH0.1VxX3-qsFhZK9iRfNrofqQT28l0j9F2dfOmC4RR0CpY';
         const client = supabase.createClient(URL_API, KEY_API);
 
-        let dados={lojas:[],banners:[],clicks:[],precos:[]}, charts={}, upsellAtivo=true;
+        let dados={lojas:[],banners:[],clicks:[],precos:[], config: {}};
+        let charts={}, upsellAtivo=true, promoAtiva=false;
 
         async function fazerLogin() {
             const btn = document.getElementById('btnLogin');
@@ -151,12 +178,22 @@
                 client.from('banners').select('*').order('created_at',{ascending:false}),
                 client.from('clicks').select('*'),
                 client.from('precos').select('*'),
-                client.from('config').select('ativo').eq('chave','upsell_banner').single()
+                client.from('config').select('*') // Carrega toda a config
             ]);
             dados.lojas=l.data||[]; dados.banners=b.data||[]; dados.clicks=c.data||[]; dados.precos=p.data||[];
-            if(cfg.data) upsellAtivo=cfg.data.ativo;
+            
+            // Processa Configs
+            if(cfg.data) {
+                cfg.data.forEach(item => { dados.config[item.chave] = item; });
+                upsellAtivo = dados.config['upsell_banner']?.ativo ?? true;
+                promoAtiva = dados.config['modo_lancamento']?.ativo ?? false;
+                
+                // Preenche campos da promo
+                if(dados.config['promo_titulo']) document.getElementById('promo_titulo').value = dados.config['promo_titulo'].valor_texto || '';
+                if(dados.config['promo_rotulo']) document.getElementById('promo_rotulo').value = dados.config['promo_rotulo'].valor_texto || '';
+            }
 
-            attDash(); renderMarketing(); renderLojas(); renderRelatorio(); preencherConfig(); renderBtnUpsell();
+            attDash(); renderMarketing(); renderLojas(); renderRelatorio(); preencherPrecos(); renderBtnUpsell(); renderBtnPromo();
         }
 
         function getPreco(k) { const x=dados.precos.find(i=>i.chave===k); return x?parseFloat(x.valor):0; }
@@ -165,18 +202,17 @@
             const pros = dados.lojas.filter(l=>l.plano==='pro').length;
             const bannersOn = dados.banners.filter(b=>b.status==='ativo').length;
             const fat = (pros*getPreco('plano_pro')) + (bannersOn*getPreco('banner_30d'));
-            
             document.getElementById('kpi-lojas').innerText = dados.lojas.length;
             document.getElementById('kpi-pro').innerText = pros;
             document.getElementById('kpi-banners').innerText = bannersOn;
             document.getElementById('kpi-faturamento').innerText = fat.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-
+            
             const clicksSeg={}; dados.clicks.forEach(c=>{clicksSeg[c.segmento]=(clicksSeg[c.segmento]||0)+1});
             renderChart('chartSegmentos','bar',Object.keys(clicksSeg),Object.values(clicksSeg),'#3B82F6','Cliques');
-
+            
             const bAuto=dados.banners.filter(b=>b.nome_cliente!=='Manual').length, bMan=dados.banners.filter(b=>b.nome_cliente==='Manual').length;
             renderChart('chartBanners','doughnut',['Site','Manual'],[bAuto,bMan],['#8B5CF6','#10B981'],'Banners');
-
+            
             const lojasEst={}; dados.lojas.forEach(l=>{lojasEst[l.estado||'ND']=(lojasEst[l.estado||'ND']||0)+1});
             renderChart('chartEstados','bar',Object.keys(lojasEst),Object.values(lojasEst),'#10B981','Lojas');
         }
@@ -191,7 +227,6 @@
             const elP=document.getElementById('listaPendentes');
             if(pen.length===0) elP.innerHTML='<p class="p-4 text-gray-400 text-xs">Nada pendente.</p>';
             else elP.innerHTML=pen.map(b=>`<div class="p-4 border-b flex items-center gap-4"><img src="${b.imagem_url}" class="w-16 h-8 rounded object-cover cursor-pointer" onclick="window.open(this.src)"><div class="flex-1"><p class="font-bold text-sm">${b.nome_cliente}</p><p class="text-xs text-gray-500">${b.plano_dias}d | ${b.telefone_cliente}</p></div><div class="flex gap-2"><button onclick="aprovBan('${b.id}',${b.plano_dias})" class="bg-green-500 text-white px-3 py-1 rounded text-xs">V</button><button onclick="delBan('${b.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs">X</button></div></div>`).join('');
-
             const atv=dados.banners.filter(b=>b.status==='ativo');
             document.getElementById('listaAtivos').innerHTML=atv.map(b=>`<div class="border rounded p-2 relative"><img src="${b.imagem_url}" class="w-full h-24 object-cover rounded"><div class="absolute top-1 right-1"><button onclick="delBan('${b.id}')" class="bg-red-600 text-white p-1 rounded text-[10px]">X</button></div><p class="text-xs font-bold mt-1 truncate">${b.nome_cliente}</p></div>`).join('');
         }
@@ -209,16 +244,35 @@
 
         function renderRelatorio() {
             const pPro=getPreco('plano_pro'), qPro=dados.lojas.filter(l=>l.plano==='pro').length, tPro=qPro*pPro;
-            const qBan=dados.banners.filter(b=>b.status==='ativo').length, tBan=qBan*getPreco('banner_30d'); // Estimativa
+            const qBan=dados.banners.filter(b=>b.status==='ativo').length, tBan=qBan*getPreco('banner_30d');
             document.getElementById('tabelaFinanceira').innerHTML=`<tr class="bg-white border-b"><td class="px-6 py-4">PRO</td><td class="px-6 py-4">${qPro}</td><td class="px-6 py-4 text-right">R$ ${tPro.toFixed(2)}</td></tr><tr class="bg-white border-b"><td class="px-6 py-4">Ads</td><td class="px-6 py-4">${qBan}</td><td class="px-6 py-4 text-right">R$ ${tBan.toFixed(2)}</td></tr>`;
             document.getElementById('totalGeralRelatorio').innerText=(tPro+tBan).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
         }
 
-        function preencherConfig(){ if(dados.precos.length){ document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); } }
-        async function salvarPrecos() { const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; for(const x of u) await client.from('precos').upsert(x); alert('Salvo!'); carregarDados(); }
+        function preencherPrecos(){ 
+            if(dados.precos.length){ 
+                document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); 
+                document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); 
+                document.getElementById('promo_preco').value=getPreco('promo_preco'); 
+            } 
+        }
+        async function salvarPrecos() { 
+            const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; 
+            for(const x of u) await client.from('precos').upsert(x); alert('Preços Salvos!'); carregarDados(); 
+        }
         
+        async function salvarPromo() {
+            await client.from('config').upsert({chave:'promo_titulo', valor_texto: document.getElementById('promo_titulo').value});
+            await client.from('config').upsert({chave:'promo_rotulo', valor_texto: document.getElementById('promo_rotulo').value});
+            await client.from('precos').upsert({chave:'promo_preco', valor: document.getElementById('promo_preco').value});
+            alert('Promoção Configurada!');
+        }
+
         function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";} }
         async function toggleUpsell(){ upsellAtivo=!upsellAtivo; await client.from('config').upsert({chave:'upsell_banner',ativo:upsellAtivo}); renderBtnUpsell(); }
+
+        function renderBtnPromo(){ const b=document.getElementById('btnPromo'); if(promoAtiva){b.innerText="PROMO ATIVA ✅";b.className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold text-xs shadow animate-pulse";}else{b.innerText="DESLIGADO";b.className="bg-gray-300 text-gray-600 px-6 py-2 rounded-lg font-bold text-xs shadow";} }
+        async function togglePromo(){ promoAtiva=!promoAtiva; await client.from('config').upsert({chave:'modo_lancamento',ativo:promoAtiva}); renderBtnPromo(); }
 
         function renderLojas(){ document.getElementById('listaLojas').innerHTML=dados.lojas.map(l=>`<div class="p-4 flex justify-between items-center hover:bg-gray-50 border-b"><div class="flex gap-3 items-center"><img src="${l.logo_url}" class="w-8 h-8 rounded object-cover"><p class="text-sm font-bold">${l.nome_fantasia}</p></div><div class="flex gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${l.plano==='pro'?'bg-yellow-100 text-yellow-800':'bg-gray-100'}">${l.plano.toUpperCase()}</span><button onclick="mudarPlano('${l.id}','${l.plano==='pro'?'gratis':'pro'}')" class="text-blue-500 text-xs border px-2 rounded">Mudar</button><button onclick="apagarLoja('${l.id}')" class="text-red-500 text-xs">X</button></div></div>`).join(''); }
         async function mudarPlano(id,n){ if(confirm('Mudar?')) {await client.from('lojas').update({plano:n}).eq('id',id); carregarDados();} }
@@ -226,3 +280,5 @@
     </script>
 </body>
 </html>
+   
+       
