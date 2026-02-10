@@ -44,7 +44,6 @@
                 </div>
                 <i data-lucide="rocket" class="w-5 h-5 text-purple-500"></i>
             </label>
-
             <div id="areaUploadBanner" class="hidden bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 text-center">
                 <p class="text-xs font-bold text-gray-500 mb-2">Sua imagem aparecerá no topo do site</p>
                 <button onclick="document.getElementById('fileBanner').click()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-100 w-full mb-2">
@@ -53,7 +52,6 @@
                 <input type="file" id="fileBanner" accept="image/*" class="hidden" onchange="abrirRecorte(this)">
                 <img id="previewBanner" class="w-full h-20 object-cover rounded hidden border border-gray-300 shadow-sm">
                 <p id="statusBanner" class="text-[10px] text-red-500 mt-1 hidden">Obrigatório escolher uma imagem</p>
-                
                 <input type="text" id="linkBanner" placeholder="Link de destino (Ex: Seu WhatsApp)" class="w-full p-2 mt-2 border rounded text-xs">
             </div>
         </div>
@@ -66,7 +64,6 @@
                     <span class="text-5xl font-black text-gray-900 transition-all" id="valorDisplay">...</span>
                 </div>
             </div>
-
             <button onclick="acaoBotao()" id="btnPagar" disabled class="w-full mt-4 bg-[#D4AF37] hover:bg-[#b5952f] text-white font-bold py-4 rounded-xl shadow-lg transition flex justify-center gap-2 items-center text-lg disabled:opacity-50 disabled:cursor-not-allowed">
                 Carregando...
             </button>
@@ -102,14 +99,11 @@
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-2">Ajustar Banner</h3>
             <div class="crop-container"><img id="image-to-crop" style="max-width: 100%;"></div>
-            <div class="flex gap-2 mt-4">
-                <button onclick="fecharModal()" class="w-1/2 bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button>
-                <button onclick="confirmarRecorte()" class="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-bold">Confirmar</button>
-            </div>
+            <div class="flex gap-2 mt-4"><button onclick="fecharModal()" class="w-1/2 bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button><button onclick="confirmarRecorte()" class="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-bold">Confirmar</button></div>
         </div>
     </div>
 
-    <script>
+     <script>
         lucide.createIcons();
         
         // ⚠️ COLE SUAS CHAVES AQUI
@@ -136,7 +130,7 @@
                 if(precos.data) {
                     precos.data.forEach(p => {
                         if(p.chave==='plano_pro') precoBase=parseFloat(p.valor);
-                        if(p.chave==='banner_30d') precoBanner=parseFloat(p.valor); // Upsell padrão: 30 dias
+                        if(p.chave==='banner_30d') precoBanner=parseFloat(p.valor);
                         if(p.chave==='promo_preco') promoPreco=parseFloat(p.valor);
                     });
                 }
@@ -148,14 +142,24 @@
                 const btn = document.getElementById('btnPagar');
                 
                 if (isPromo) {
+                    // SE FOR PROMOÇÃO ATIVA
                     const displayPreco = promoPreco > 0 ? `R$ ${promoPreco.toFixed(2).replace('.',',')}` : promoRotulo;
-                    document.getElementById('areaPreco').innerHTML = `<p class="text-green-600 text-xs font-bold uppercase bg-green-100 px-3 py-1 rounded-full w-fit mx-auto mb-2">🎉 ${promoTitulo}</p><div class="flex flex-col justify-center items-center"><span class="riscado mb-[-10px]">R$ ${precoBase.toFixed(2).replace('.',',')}</span><span class="text-5xl font-black text-green-600">${displayPreco}</span></div>`;
+                    
+                    // Exibe a Descrição da Campanha e o Rótulo
+                    document.getElementById('areaPreco').innerHTML = `
+                        <p class="text-green-600 text-xs font-bold uppercase bg-green-100 px-3 py-1 rounded-full w-fit mx-auto mb-2">🎉 ${promoTitulo}</p>
+                        <div class="flex flex-col justify-center items-center">
+                            <span class="riscado mb-[-10px]">R$ ${precoBase.toFixed(2).replace('.',',')}</span>
+                            <span class="text-5xl font-black text-green-600">${displayPreco}</span>
+                        </div>
+                    `;
                     
                     btn.disabled = false;
                     btn.innerHTML = promoPreco > 0 ? `PAGAR COM DESCONTO <i data-lucide="qr-code" class="w-5 h-5 ml-2"></i>` : `LIBERAR ACESSO <i data-lucide="check-circle" class="w-5 h-5 ml-2"></i>`;
                     btn.className = "w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg transition flex justify-center gap-2 items-center text-lg";
-                    document.getElementById('boxUpsell').classList.add('hidden');
+                    document.getElementById('boxUpsell').classList.add('hidden'); // Sem Upsell na Promo
                 } else {
+                    // PREÇO NORMAL
                     document.getElementById('valorDisplay').innerText = precoBase.toLocaleString('pt-BR', {minimumFractionDigits: 2});
                     if (cfgUpsell.data && cfgUpsell.data.ativo) {
                         document.getElementById('boxUpsell').classList.remove('hidden');
@@ -168,17 +172,10 @@
             } catch (error) { console.log("Erro load", error); }
         }
 
-        // --- LÓGICA DO UPSELL COM UPLOAD ---
         window.toggleBannerUpload = function() {
             const check = document.getElementById('checkBanner');
             const area = document.getElementById('areaUploadBanner');
-            if(check.checked) {
-                area.classList.remove('hidden');
-            } else {
-                area.classList.add('hidden');
-                blobBanner = null; // Limpa se desmarcar
-                document.getElementById('previewBanner').classList.add('hidden');
-            }
+            if(check.checked) { area.classList.remove('hidden'); } else { area.classList.add('hidden'); blobBanner = null; document.getElementById('previewBanner').classList.add('hidden'); }
             calcularTotal();
         }
 
@@ -189,110 +186,48 @@
             document.getElementById('valorDisplay').innerText = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         }
 
-        // --- CROPPER (IGUAL AO ANUNCIAR.HTML) ---
-        window.abrirRecorte = function(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('modal-crop').style.display = 'flex';
-                    const img = document.getElementById('image-to-crop'); img.src = e.target.result;
-                    setTimeout(() => { if(cropper) cropper.destroy(); cropper = new Cropper(img, { aspectRatio: 3/1, viewMode: 1, autoCropArea: 1 }); }, 100);
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-            input.value = '';
-        }
-        window.confirmarRecorte = function() {
-            if(!cropper) return;
-            cropper.getCroppedCanvas({ width: 1200 }).toBlob(b => {
-                blobBanner = b;
-                document.getElementById('previewBanner').src = URL.createObjectURL(b);
-                document.getElementById('previewBanner').classList.remove('hidden');
-                document.getElementById('statusBanner').classList.add('hidden');
-                fecharModal();
-            }, 'image/jpeg', 0.85);
-        }
+        window.abrirRecorte = function(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { document.getElementById('modal-crop').style.display = 'flex'; const img = document.getElementById('image-to-crop'); img.src = e.target.result; setTimeout(() => { if(cropper) cropper.destroy(); cropper = new Cropper(img, { aspectRatio: 3/1, viewMode: 1, autoCropArea: 1 }); }, 100); }; reader.readAsDataURL(input.files[0]); } input.value = ''; }
+        window.confirmarRecorte = function() { if(!cropper) return; cropper.getCroppedCanvas({ width: 1200 }).toBlob(b => { blobBanner = b; document.getElementById('previewBanner').src = URL.createObjectURL(b); document.getElementById('previewBanner').classList.remove('hidden'); document.getElementById('statusBanner').classList.add('hidden'); fecharModal(); }, 'image/jpeg', 0.85); }
         window.fecharModal = function() { document.getElementById('modal-crop').style.display = 'none'; if(cropper) { cropper.destroy(); cropper = null; } }
 
-        // --- AÇÃO FINAL ---
         window.acaoBotao = async function() {
-            const btn = document.getElementById('btnPagar');
-            const originalText = btn.innerHTML;
-            
-            // Verifica Promoção Grátis
+            const btn = document.getElementById('btnPagar'); const originalText = btn.innerHTML;
             if (isPromo && promoPreco === 0) {
                 const msg = `Olá! Fiz meu cadastro na promoção *${promoTitulo}* (${promoRotulo}). Pode liberar meu acesso PRO?`;
                 window.location.href = `https://wa.me/${MEU_ZAP}?text=${encodeURIComponent(msg)}`;
                 return;
             }
-
-            // Verifica Upsell (Se marcou, TEM que ter foto)
             const temBanner = document.getElementById('checkBanner').checked;
-            if (!isPromo && temBanner && !blobBanner) {
-                document.getElementById('statusBanner').classList.remove('hidden');
-                alert("Você marcou o Banner! Por favor, escolha a imagem do seu anúncio.");
-                return;
-            }
-
+            if (!isPromo && temBanner && !blobBanner) { document.getElementById('statusBanner').classList.remove('hidden'); alert("Escolha a imagem do banner!"); return; }
             btn.disabled = true; btn.innerText = "Processando...";
-
             try {
-                // Se tem banner, sobe pro banco AGORA
                 if (!isPromo && temBanner && blobBanner) {
                     const nomeArq = `upsell_${Date.now()}.jpg`;
                     const { error: errUp } = await client.storage.from('sier-images').upload(nomeArq, blobBanner);
                     if(errUp) throw errUp;
-                    
                     const { data: urlData } = client.storage.from('sier-images').getPublicUrl(nomeArq);
                     const linkDest = document.getElementById('linkBanner').value;
-                    const hoje = new Date(); 
-                    hoje.setDate(hoje.getDate() + 30); // Upsell padrão é 30 dias
-
-                    // SALVA NO BANCO (STATUS PENDENTE)
-                    await client.from('banners').insert([{
-                        imagem_url: urlData.publicUrl,
-                        link_destino: linkDest,
-                        nome_cliente: "Upsell Checkout",
-                        plano_dias: 30,
-                        status: 'pendente',
-                        data_expiracao: hoje.toISOString()
-                    }]);
+                    const hoje = new Date(); hoje.setDate(hoje.getDate() + 30);
+                    await client.from('banners').insert([{ imagem_url: urlData.publicUrl, link_destino: linkDest, nome_cliente: "Upsell Checkout", plano_dias: 30, status: 'pendente', data_expiracao: hoje.toISOString() }]);
                 }
-
-                // Gera o Pix
-                abrirPagamento();
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-
-            } catch (err) {
-                alert("Erro ao salvar banner: " + err.message);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+                abrirPagamento(); btn.innerHTML = originalText; btn.disabled = false;
+            } catch (err) { alert("Erro: " + err.message); btn.innerHTML = originalText; btn.disabled = false; }
         }
 
         function abrirPagamento() {
-            document.getElementById('modal-pix').style.display = 'flex';
-            document.getElementById('qrcode').innerHTML = "";
-            
+            document.getElementById('modal-pix').style.display = 'flex'; document.getElementById('qrcode').innerHTML = "";
             const desc = isPromo ? `Promo: ${promoTitulo}` : (document.getElementById('checkBanner').checked ? "Plano PRO + Banner" : "Plano PRO");
             document.getElementById('descPix').innerText = desc;
-            
             const payload = gerarPayloadPix(PIX_CHAVE, PIX_NOME, PIX_CIDADE, total.toFixed(2), "SIERPRO");
             setTimeout(() => { new QRCode(document.getElementById("qrcode"), { text: payload, width: 160, height: 160 }); }, 100);
             document.getElementById('pixCopiaCola').value = payload;
-            
             const msg = `Olá! Fiz o pagamento de *${desc}* (R$ ${total.toFixed(2)}). Segue o comprovante:`;
             document.getElementById('btnZap').href = `https://wa.me/${MEU_ZAP}?text=${encodeURIComponent(msg)}`;
         }
-
         function copiarPix() { const el = document.getElementById("pixCopiaCola"); el.select(); el.setSelectionRange(0,99999); navigator.clipboard.writeText(el.value); alert("Copiado!"); }
         function gerarPayloadPix(chave, nome, cidade, valor, txtId) { const nomeT = nome.substring(0,25).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); const cidadeT = cidade.substring(0,15).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); const val = valor.toString(); const merchant = `0014BR.GOV.BCB.PIX01${chave.length}${chave}`; let p = `00020126${merchant.length}${merchant}520400005303986540${val.length}${val}5802BR59${(nomeT.length<10?'0':'')+nomeT.length}${nomeT}60${(cidadeT.length<10?'0':'')+cidadeT.length}${cidadeT}62070503***6304`; return p + crc16(p); }
         function crc16(buffer) { let crc = 0xFFFF; for (let i = 0; i < buffer.length; i++) { crc = ((crc >>> 8) | (crc << 8)) & 0xffff; crc ^= (buffer.charCodeAt(i) & 0x00ff); crc ^= ((crc & 0xff) >> 4); crc ^= (crc << 12) & 0xffff; crc ^= ((crc & 0xFF) << 5) & 0xffff; } return crc.toString(16).toUpperCase().padStart(4, '0'); }
-
         carregarDados();
     </script>
 </body>
-</html>
-  
-       
+</html>  
