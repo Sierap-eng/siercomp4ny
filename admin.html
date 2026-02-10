@@ -48,9 +48,8 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500"><p class="text-xs text-gray-400 font-bold">BANNERS</p><h3 class="text-2xl font-black text-purple-600" id="kpi-banners">0</h3></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-4 rounded-xl shadow-sm"><h3 class="font-bold mb-2 text-sm">Cliques por Segmento (WhatsApp)</h3><canvas id="chartSegmentos"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><h3 class="font-bold mb-2 text-sm">Cliques (WhatsApp)</h3><canvas id="chartSegmentos"></canvas></div>
                     <div class="bg-white p-4 rounded-xl shadow-sm"><h3 class="font-bold mb-2 text-sm">Origem Banners</h3><div class="h-48 flex justify-center"><canvas id="chartBanners"></canvas></div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm md:col-span-2"><h3 class="font-bold mb-2 text-sm">Lojas por Estado</h3><canvas id="chartEstados" height="80"></canvas></div>
                 </div>
             </div>
 
@@ -95,37 +94,47 @@
 
             <div id="view-config" class="hidden space-y-6">
                 
-                <div class="bg-green-50 rounded-xl p-6 border-2 border-green-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-green-900 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5"></i> Motor de Promoções</h3>
-                        <button id="btnPromo" onclick="togglePromo()" class="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow transition">Desativado</button>
+                <div class="bg-green-50 rounded-xl p-6 border-2 border-green-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="percent" class="w-24 h-24 text-green-900"></i></div>
+                    
+                    <div class="flex justify-between items-center mb-6 relative z-10">
+                        <div>
+                            <h3 class="font-bold text-lg text-green-900 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5"></i> Motor de Promoções</h3>
+                            <p class="text-xs text-green-700">Defina a porcentagem e o sistema calcula o preço.</p>
+                        </div>
+                        <button id="btnPromo" onclick="togglePromo()" class="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow transition transform active:scale-95">Desativado</button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
                         <div>
-                            <label class="text-[10px] font-bold text-green-700 uppercase">Título da Campanha</label>
-                            <input type="text" id="promo_titulo" placeholder="Ex: Black Friday" class="w-full p-2 rounded border border-green-300 text-sm">
+                            <label class="text-[10px] font-bold text-green-700 uppercase mb-1 block">1. Descrição da Campanha</label>
+                            <input type="text" id="promo_titulo" placeholder="Ex: Lançamento VIP" class="w-full p-3 rounded-lg border border-green-300 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                            <p class="text-[9px] text-green-600 mt-1">Aparece em destaque no topo.</p>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-green-700 uppercase">Texto do Desconto (Display)</label>
-                            <input type="text" id="promo_rotulo" placeholder="Ex: 20% OFF ou GRÁTIS" class="w-full p-2 rounded border border-green-300 text-sm">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-green-700 uppercase">Valor a Cobrar (R$)</label>
-                            <input type="number" id="promo_preco" step="0.01" placeholder="0 para Grátis" class="w-full p-2 rounded border border-green-300 text-sm font-bold">
+                            <label class="text-[10px] font-bold text-green-700 uppercase mb-1 block">2. Porcentagem de Desconto (%)</label>
+                            <div class="flex items-center">
+                                <input type="number" id="promo_porcentagem" placeholder="0 a 100" min="0" max="100" class="w-full p-3 rounded-l-lg border border-green-300 text-sm font-bold text-center text-green-900 focus:ring-2 focus:ring-green-500 outline-none">
+                                <span class="bg-green-200 text-green-800 font-bold p-3 rounded-r-lg text-sm">% OFF</span>
+                            </div>
+                            <p class="text-[9px] text-green-600 mt-1">Coloque 100 para GRÁTIS. 50 para Metade.</p>
                         </div>
                     </div>
-                    <button onclick="salvarPromo()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded text-xs transition">SALVAR CONFIGURAÇÃO DA PROMOÇÃO</button>
+                    
+                    <button onclick="salvarPromo()" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-xs transition shadow-lg flex justify-center gap-2 items-center">
+                        <i data-lucide="save" class="w-4 h-4"></i> SALVAR E CALCULAR AUTOMATICAMENTE
+                    </button>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="font-bold text-gray-800 mb-4">Tabela de Preços Padrão</h3>
+                    <h3 class="font-bold text-gray-800 mb-4">Preços Originais (Base de Cálculo)</h3>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-xs font-bold text-gray-400">PLANO PRO</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold"></div>
+                        <div><label class="text-xs font-bold text-gray-400">PLANO PRO (Base)</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold bg-gray-50"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 7D</label><input type="number" id="price_7d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 14D</label><input type="number" id="price_14d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                         <div><label class="text-xs font-bold text-gray-400">BANNER 30D</label><input type="number" id="price_30d" step="0.01" class="w-full border-b p-2 font-bold"></div>
                     </div>
-                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold">SALVAR PREÇOS PADRÃO</button>
+                    <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold hover:bg-blue-700">SALVAR PREÇOS PADRÃO</button>
                 </div>
 
                 <div class="bg-purple-50 rounded-xl p-4 border border-purple-200 flex justify-between items-center">
@@ -136,7 +145,7 @@
         </main>
     </div>
 
-    <script>
+     <script>
         lucide.createIcons();
         const SENHA_MESTRA = "sier2026";
         
@@ -178,11 +187,10 @@
                 client.from('banners').select('*').order('created_at',{ascending:false}),
                 client.from('clicks').select('*'),
                 client.from('precos').select('*'),
-                client.from('config').select('*') // Carrega toda a config
+                client.from('config').select('*')
             ]);
             dados.lojas=l.data||[]; dados.banners=b.data||[]; dados.clicks=c.data||[]; dados.precos=p.data||[];
             
-            // Processa Configs
             if(cfg.data) {
                 cfg.data.forEach(item => { dados.config[item.chave] = item; });
                 upsellAtivo = dados.config['upsell_banner']?.ativo ?? true;
@@ -190,7 +198,7 @@
                 
                 // Preenche campos da promo
                 if(dados.config['promo_titulo']) document.getElementById('promo_titulo').value = dados.config['promo_titulo'].valor_texto || '';
-                if(dados.config['promo_rotulo']) document.getElementById('promo_rotulo').value = dados.config['promo_rotulo'].valor_texto || '';
+                if(dados.config['promo_porcentagem']) document.getElementById('promo_porcentagem').value = dados.config['promo_porcentagem'].valor_texto || '0';
             }
 
             attDash(); renderMarketing(); renderLojas(); renderRelatorio(); preencherPrecos(); renderBtnUpsell(); renderBtnPromo();
@@ -249,29 +257,37 @@
             document.getElementById('totalGeralRelatorio').innerText=(tPro+tBan).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
         }
 
-        function preencherPrecos(){ 
-            if(dados.precos.length){ 
-                document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); 
-                document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); 
-                document.getElementById('promo_preco').value=getPreco('promo_preco'); 
-            } 
-        }
-        async function salvarPrecos() { 
-            const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; 
-            for(const x of u) await client.from('precos').upsert(x); alert('Preços Salvos!'); carregarDados(); 
-        }
+        function preencherPrecos(){ if(dados.precos.length){ document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); } }
+        async function salvarPrecos() { const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; for(const x of u) await client.from('precos').upsert(x); alert('Preços Salvos!'); carregarDados(); }
         
+        // --- MOTOR DE PROMOÇÕES INTELIGENTE ---
         async function salvarPromo() {
-            await client.from('config').upsert({chave:'promo_titulo', valor_texto: document.getElementById('promo_titulo').value});
-            await client.from('config').upsert({chave:'promo_rotulo', valor_texto: document.getElementById('promo_rotulo').value});
-            await client.from('precos').upsert({chave:'promo_preco', valor: document.getElementById('promo_preco').value});
-            alert('Promoção Configurada!');
+            const percent = parseFloat(document.getElementById('promo_porcentagem').value) || 0;
+            const titulo = document.getElementById('promo_titulo').value || 'Promoção';
+            
+            // 1. Calcula o Preço
+            const precoBase = parseFloat(document.getElementById('price_pro').value);
+            let novoPreco = precoBase - (precoBase * (percent / 100));
+            if(novoPreco < 0) novoPreco = 0;
+
+            // 2. Define o Rótulo Automático
+            let rotulo = '';
+            if(percent >= 100) rotulo = 'GRÁTIS';
+            else rotulo = `${percent}% OFF`;
+
+            // 3. Salva Tudo
+            await client.from('config').upsert({chave:'promo_titulo', valor_texto: titulo});
+            await client.from('config').upsert({chave:'promo_rotulo', valor_texto: rotulo});
+            await client.from('config').upsert({chave:'promo_porcentagem', valor_texto: percent.toString()});
+            await client.from('precos').upsert({chave:'promo_preco', valor: novoPreco}); // Salva o valor já calculado
+
+            alert(`Configurado!\nDesconto: ${percent}%\nNovo Preço: R$ ${novoPreco.toFixed(2)}\nRótulo: ${rotulo}`);
         }
 
-        function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-xs shadow";} }
+        function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-4 py-2 rounded text-xs font-bold shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-4 py-2 rounded text-xs font-bold shadow";} }
         async function toggleUpsell(){ upsellAtivo=!upsellAtivo; await client.from('config').upsert({chave:'upsell_banner',ativo:upsellAtivo}); renderBtnUpsell(); }
 
-        function renderBtnPromo(){ const b=document.getElementById('btnPromo'); if(promoAtiva){b.innerText="PROMO ATIVA ✅";b.className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold text-xs shadow animate-pulse";}else{b.innerText="DESLIGADO";b.className="bg-gray-300 text-gray-600 px-6 py-2 rounded-lg font-bold text-xs shadow";} }
+        function renderBtnPromo(){ const b=document.getElementById('btnPromo'); if(promoAtiva){b.innerText="PROMO ATIVA 🚀";b.className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold text-xs shadow animate-pulse";}else{b.innerText="DESLIGADO";b.className="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow";} }
         async function togglePromo(){ promoAtiva=!promoAtiva; await client.from('config').upsert({chave:'modo_lancamento',ativo:promoAtiva}); renderBtnPromo(); }
 
         function renderLojas(){ document.getElementById('listaLojas').innerHTML=dados.lojas.map(l=>`<div class="p-4 flex justify-between items-center hover:bg-gray-50 border-b"><div class="flex gap-3 items-center"><img src="${l.logo_url}" class="w-8 h-8 rounded object-cover"><p class="text-sm font-bold">${l.nome_fantasia}</p></div><div class="flex gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${l.plano==='pro'?'bg-yellow-100 text-yellow-800':'bg-gray-100'}">${l.plano.toUpperCase()}</span><button onclick="mudarPlano('${l.id}','${l.plano==='pro'?'gratis':'pro'}')" class="text-blue-500 text-xs border px-2 rounded">Mudar</button><button onclick="apagarLoja('${l.id}')" class="text-red-500 text-xs">X</button></div></div>`).join(''); }
@@ -279,6 +295,7 @@
         async function apagarLoja(id){ if(confirm('Apagar?')) {await client.from('lojas').delete().eq('id',id); carregarDados();} }
     </script>
 </body>
-</html>
+</html>   
    
        
+
