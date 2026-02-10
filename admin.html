@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SierAdmin 2.0 - War Room</title>
+    <title>SierAdmin - War Room</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,123 +11,106 @@
     <style>
         .aba-ativa { border-bottom: 2px solid #0066FF; color: #0066FF; font-weight: bold; } 
         .aba-inativa { color: #666; cursor: pointer; }
-        .card-kpi { @apply bg-white p-5 rounded-xl shadow-sm border border-gray-100; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
+<body class="bg-gray-100 min-h-screen font-sans">
 
     <div id="telaLogin" class="fixed inset-0 bg-gray-900 z-[60] flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <div class="mb-4 bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                <i data-lucide="shield-check" class="w-8 h-8 text-blue-600"></i>
-            </div>
-            <h1 class="text-2xl font-bold mb-2 text-gray-800">SierAdmin Seguro</h1>
-            <p class="text-xs text-gray-500 mb-6">Acesso exclusivo da diretoria.</p>
-            <input type="password" id="senhaInput" placeholder="Senha de Acesso" class="w-full p-3 border rounded-lg mb-4 text-center bg-gray-50">
-            <button onclick="fazerLogin()" id="btnLogin" class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-bold transition">ACESSAR SISTEMA</button>
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">SierAdmin</h1>
+            <input type="password" id="senhaInput" placeholder="Senha Mestra" class="w-full p-3 border rounded-lg mb-4 text-center">
+            <button onclick="fazerLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">ENTRAR</button>
         </div>
     </div>
 
     <div id="painelAdmin" class="hidden">
-        <header class="bg-white border-b sticky top-0 z-40 shadow-sm">
+        <header class="bg-white border-b sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center overflow-x-auto">
-                <div class="flex items-center gap-2 mr-4">
-                    <h1 class="font-bold text-xl text-gray-800 tracking-tight">Sier<span class="text-blue-600">Admin</span></h1>
-                </div>
-                <nav class="flex gap-6 h-full items-center whitespace-nowrap">
-                    <button onclick="mudarAba('dashboard')" id="tab-dashboard" class="aba-ativa h-full text-sm">Visão Geral</button>
-                    <button onclick="mudarAba('lojas')" id="tab-lojas" class="aba-inativa h-full text-sm">Lojas</button>
-                    <button onclick="mudarAba('marketing')" id="tab-marketing" class="aba-inativa h-full text-sm">Ads & Banners</button>
-                    <button onclick="mudarAba('relatorios')" id="tab-relatorios" class="aba-inativa h-full text-sm">Financeiro</button>
-                    <button onclick="mudarAba('config')" id="tab-config" class="aba-inativa h-full text-sm text-orange-600">Config</button>
+                <h1 class="font-bold text-lg mr-4">Sier<span class="text-blue-600">Admin</span></h1>
+                <nav class="flex gap-4 h-full items-center whitespace-nowrap">
+                    <button onclick="mudarAba('dashboard')" id="tab-dashboard" class="aba-ativa h-full text-xs md:text-sm">Dashboard</button>
+                    <button onclick="mudarAba('lojas')" id="tab-lojas" class="aba-inativa h-full text-xs md:text-sm">Lojas</button>
+                    <button onclick="mudarAba('marketing')" id="tab-marketing" class="aba-inativa h-full text-xs md:text-sm text-purple-600">Ads</button>
+                    <button onclick="mudarAba('relatorios')" id="tab-relatorios" class="aba-inativa h-full text-xs md:text-sm">Financeiro</button>
+                    <button onclick="mudarAba('config')" id="tab-config" class="aba-inativa h-full text-xs md:text-sm text-orange-600">Config</button>
                 </nav>
-                <button onclick="location.reload()" class="text-red-500 p-2 ml-2 hover:bg-red-50 rounded-full transition"><i data-lucide="power" class="w-5 h-5"></i></button>
+                <button onclick="location.reload()" class="text-red-500 p-2 ml-2"><i data-lucide="power" class="w-5 h-5"></i></button>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 pb-20">
             
-            <div id="view-dashboard" class="space-y-6 animate-fade-in">
+            <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="card-kpi">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Faturamento (Mês)</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-gray-800" id="kpi-faturamento">R$ 0,00</h3>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-400 font-bold">FATURAMENTO</p><h3 class="text-2xl font-black text-gray-800" id="kpi-faturamento">R$ 0,00</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-400 font-bold">LOJAS</p><h3 class="text-2xl font-black text-gray-800" id="kpi-lojas">0</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-400"><p class="text-xs text-gray-400 font-bold">PRO</p><h3 class="text-2xl font-black text-yellow-600" id="kpi-pro">0</h3></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500"><p class="text-xs text-gray-400 font-bold">BANNERS</p><h3 class="text-2xl font-black text-purple-600" id="kpi-banners">0</h3></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-yellow-500"></i> Top 5 Lojas (Cliques)</h3>
+                        <ul id="listaRanking" class="space-y-3 text-sm">
+                            <li class="text-gray-400 text-xs">Carregando dados...</li>
+                        </ul>
                     </div>
-                    <div class="card-kpi">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Total de Lojas</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-gray-800" id="kpi-lojas">0</h3>
-                    </div>
-                    <div class="card-kpi border-l-4 border-l-yellow-400">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Lojas PRO</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-yellow-600" id="kpi-pro">0</h3>
-                    </div>
-                    <div class="card-kpi border-l-4 border-l-purple-500">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Banners Ativos</p>
-                        <h3 class="text-2xl md:text-3xl font-black text-purple-600" id="kpi-banners">0</h3>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 col-span-1 md:col-span-2">
+                        <h3 class="font-bold text-gray-800 mb-1 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Cliques por Segmento</h3>
+                        <div class="h-48"><canvas id="chartSegmentos"></canvas></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-gray-800 mb-1 flex items-center gap-2"><i data-lucide="mouse-pointer" class="w-4 h-4 text-blue-500"></i> Cliques por Segmento (WhatsApp)</h3>
-                        <canvas id="chartSegmentos"></canvas>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-gray-800 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-purple-500"></i> Origem Banners (Auto vs Manual)</h3>
-                        <div class="h-64 flex justify-center"><canvas id="chartBanners"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 col-span-1 md:col-span-2">
-                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-green-500"></i> Lojas por Estado</h3>
-                        <canvas id="chartEstados" height="80"></canvas>
-                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200"><h3 class="font-bold text-gray-800 mb-2 text-sm">Origem Banners</h3><div class="h-48 flex justify-center"><canvas id="chartBanners"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200"><h3 class="font-bold text-gray-800 mb-2 text-sm">Lojas por Estado</h3><div class="h-48"><canvas id="chartEstados"></canvas></div></div>
                 </div>
             </div>
 
-            <div id="view-lojas" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-4 border-b bg-gray-50 flex justify-between items-center"><h3 class="font-bold text-gray-700">Parceiros</h3><button onclick="carregarDados()" class="text-blue-600 text-xs font-bold hover:underline">Atualizar</button></div>
+            <div id="view-lojas" class="hidden bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div class="p-4 border-b bg-gray-50 flex justify-between"><h3 class="font-bold">Lojas</h3><button onclick="carregarDados()" class="text-blue-600 text-xs font-bold">Atualizar</button></div>
                 <div id="listaLojas" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto"></div>
             </div>
 
             <div id="view-marketing" class="hidden space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
-                    <div class="p-4 bg-orange-50 font-bold text-orange-800 flex gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Pendentes (Aprovar Pix)</div>
+                    <div class="p-4 bg-orange-50 font-bold text-orange-800 flex gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Pendentes</div>
                     <div id="listaPendentes" class="divide-y divide-orange-100"></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 bg-gray-50 font-bold text-gray-700">Banners no Ar</div>
+                    <div class="p-4 bg-gray-50 font-bold text-gray-700">Ativos</div>
                     <div id="listaAtivos" class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4"></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200">
-                    <h3 class="font-bold text-gray-500 text-sm mb-4">Upload Manual (WhatsApp)</h3>
+                <div class="bg-white p-6 rounded-xl border">
+                    <h3 class="font-bold text-gray-500 text-sm mb-4">Upload Manual</h3>
                     <div class="flex flex-col md:flex-row gap-2 items-end">
-                        <div class="w-full"><label class="text-[10px] uppercase font-bold text-gray-400">Imagem</label><input type="file" id="bannerFile" class="text-xs w-full bg-gray-50 p-2 rounded border"></div>
-                        <div class="w-full"><label class="text-[10px] uppercase font-bold text-gray-400">Link Destino</label><input type="text" id="bannerLink" placeholder="https://..." class="text-xs w-full p-2 rounded border"></div>
-                        <div class="w-32"><label class="text-[10px] uppercase font-bold text-gray-400">Dias</label><input type="number" id="manualDias" value="30" class="text-xs w-full p-2 rounded border text-center font-bold"></div>
+                        <div class="w-full"><label class="text-[10px] font-bold">IMAGEM</label><input type="file" id="bannerFile" class="text-xs w-full bg-gray-50 p-2 rounded border"></div>
+                        <div class="w-full"><label class="text-[10px] font-bold">LINK</label><input type="text" id="bannerLink" placeholder="https://..." class="text-xs w-full p-2 rounded border"></div>
+                        <div class="w-32"><label class="text-[10px] font-bold">DIAS</label><input type="number" id="manualDias" value="30" class="text-xs w-full p-2 rounded border text-center font-bold"></div>
                         <button onclick="uploadManual()" class="bg-gray-800 text-white px-6 py-2 rounded text-xs font-bold h-[34px]">ENVIAR</button>
                     </div>
                 </div>
             </div>
 
             <div id="view-relatorios" class="hidden space-y-6">
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <i data-lucide="file-spreadsheet" class="w-12 h-12 text-green-600 mx-auto mb-3"></i>
+                <div class="bg-white p-8 rounded-xl shadow-sm border text-center">
                     <h2 class="text-2xl font-bold text-gray-800">Relatório Financeiro</h2>
-                    <p class="text-gray-500 text-sm mb-6">Resumo para Contabilidade.</p>
-                    <div class="overflow-x-auto border rounded-lg">
+                    <div class="overflow-x-auto border rounded-lg mt-4">
                         <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">Descrição</th><th class="px-6 py-3">Qtd</th><th class="px-6 py-3 text-right">Total Estimado</th></tr></thead>
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">Item</th><th class="px-6 py-3">Qtd</th><th class="px-6 py-3 text-right">Total</th></tr></thead>
                             <tbody id="tabelaFinanceira"></tbody>
-                            <tfoot class="font-bold text-gray-900 bg-gray-100"><tr><td class="px-6 py-3">TOTAL GERAL</td><td class="px-6 py-3">-</td><td class="px-6 py-3 text-right text-lg text-green-600" id="totalGeralRelatorio">R$ 0,00</td></tr></tfoot>
+                            <tfoot class="font-bold text-gray-900 bg-gray-100"><tr><td class="px-6 py-3">TOTAL</td><td class="px-6 py-3">-</td><td class="px-6 py-3 text-right text-lg text-green-600" id="totalGeralRelatorio">R$ 0,00</td></tr></tfoot>
                         </table>
                     </div>
-                    <button onclick="window.print()" class="mt-6 bg-gray-800 text-white px-6 py-2 rounded-lg font-bold text-xs hover:bg-black transition flex mx-auto gap-2 items-center"><i data-lucide="printer" class="w-4 h-4"></i> IMPRIMIR / PDF</button>
+                    <button onclick="window.print()" class="mt-6 bg-gray-800 text-white px-6 py-2 rounded-lg font-bold text-xs">IMPRIMIR</button>
                 </div>
             </div>
 
             <div id="view-config" class="hidden space-y-6">
                 <div class="bg-green-50 rounded-xl p-6 border-2 border-green-200 shadow-sm relative overflow-hidden">
                     <div class="flex justify-between items-center mb-6 relative z-10">
-                        <div><h3 class="font-bold text-lg text-green-900 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5"></i> Promoção Flexível</h3><p class="text-xs text-green-700">Configure descontos ou gratuidade.</p></div>
+                        <div><h3 class="font-bold text-lg text-green-900 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5"></i> Motor de Promoções</h3><p class="text-xs text-green-700">Calculadora Automática de Descontos.</p></div>
                         <button id="btnPromo" onclick="togglePromo()" class="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-bold text-xs shadow transition">Desativado</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
@@ -137,12 +120,7 @@
                     <button onclick="salvarPromo()" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-xs transition shadow-lg">SALVAR E CALCULAR</button>
                 </div>
 
-                <div class="bg-purple-50 rounded-xl p-4 border border-purple-200 flex justify-between items-center">
-                    <div><h3 class="font-bold text-purple-900 text-sm">Upsell (Banner no Checkout)</h3></div>
-                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-4 py-2 rounded text-xs font-bold shadow">...</button>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="bg-white p-6 rounded-xl shadow-sm border mt-4">
                     <h3 class="font-bold text-gray-800 mb-4">Preços Padrão</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="text-xs font-bold text-gray-400">PLANO PRO</label><input type="number" id="price_pro" step="0.01" class="w-full border-b p-2 font-bold"></div>
@@ -152,11 +130,16 @@
                     </div>
                     <button onclick="salvarPrecos()" class="mt-4 bg-blue-600 text-white w-full py-3 rounded-lg font-bold">SALVAR PREÇOS</button>
                 </div>
+                
+                <div class="bg-purple-50 rounded-xl p-4 border border-purple-200 flex justify-between items-center mt-4">
+                    <div><h3 class="font-bold text-purple-900 text-sm">Upsell (Checkout)</h3></div>
+                    <button id="btnUpsell" onclick="toggleUpsell()" class="bg-white text-purple-600 px-4 py-2 rounded text-xs font-bold shadow">...</button>
+                </div>
             </div>
         </main>
     </div>
 
-      <script>
+    <script>
         lucide.createIcons();
         const SENHA_MESTRA = "sier2026";
         
@@ -167,32 +150,28 @@
 
         let dados={lojas:[],banners:[],clicks:[],precos:[], config:{}}, charts={}, upsellAtivo=true, promoAtiva=false;
 
-        // --- LOGIN SEGURO (Via Banco) ---
         async function fazerLogin() {
             const btn = document.getElementById('btnLogin');
             const pass = document.getElementById('senhaInput').value;
             btn.innerText = "Verificando..."; btn.disabled = true;
-
             try {
-                // VERIFICA NO BANCO
                 const { data } = await client.from('admin_auth').select('*').eq('senha_hash', pass).single();
-                if (data || pass === "sier2026") { // Fallback temporário
+                if (data || pass === "sier2026") {
                     document.getElementById('telaLogin').classList.add('hidden');
                     document.getElementById('painelAdmin').classList.remove('hidden');
                     carregarDados();
                 } else { alert("Senha incorreta."); btn.innerText="ENTRAR"; btn.disabled=false; }
             } catch(e) { 
-                // Se der erro de conexão, tenta fallback
                 if(pass==="sier2026"){ document.getElementById('telaLogin').classList.add('hidden'); document.getElementById('painelAdmin').classList.remove('hidden'); carregarDados(); }
-                else { alert("Erro de conexão."); btn.innerText="ENTRAR"; btn.disabled=false; }
+                else { alert("Erro conexão."); btn.innerText="ENTRAR"; btn.disabled=false; }
             }
         }
 
         window.mudarAba = (aba) => {
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.className = 'aba-inativa h-full text-sm');
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.className = 'aba-inativa h-full text-xs md:text-sm');
             document.getElementById(`view-${aba}`).classList.remove('hidden');
-            document.getElementById(`tab-${aba}`).className = `aba-ativa h-full text-sm ${aba==='config'?'text-orange-600':''}`;
+            document.getElementById(`tab-${aba}`).className = `aba-ativa h-full text-xs md:text-sm ${aba==='config'?'text-orange-600':''}`;
         }
 
         async function carregarDados() {
@@ -222,7 +201,6 @@
             const pros = dados.lojas.filter(l=>l.plano==='pro').length;
             const bannersOn = dados.banners.filter(b=>b.status==='ativo').length;
             const fat = (pros*getPreco('plano_pro')) + (bannersOn*getPreco('banner_30d'));
-            
             document.getElementById('kpi-lojas').innerText = dados.lojas.length;
             document.getElementById('kpi-pro').innerText = pros;
             document.getElementById('kpi-banners').innerText = bannersOn;
@@ -236,6 +214,26 @@
 
             const lojasEst={}; dados.lojas.forEach(l=>{lojasEst[l.estado||'ND']=(lojasEst[l.estado||'ND']||0)+1});
             renderChart('chartEstados','bar',Object.keys(lojasEst),Object.values(lojasEst),'#10B981','Lojas');
+
+            // --- RANKING TOP 5 LOJAS ---
+            const clicksPorLoja = {};
+            dados.clicks.forEach(c => { 
+                if(c.loja_id) clicksPorLoja[c.loja_id] = (clicksPorLoja[c.loja_id] || 0) + 1; 
+            });
+            const ranking = Object.entries(clicksPorLoja)
+                .sort((a,b) => b[1] - a[1]) // Ordena do maior para menor
+                .slice(0, 5); // Pega só os 5 primeiros
+
+            const listaRank = document.getElementById('listaRanking');
+            if (ranking.length === 0) {
+                listaRank.innerHTML = '<li class="text-gray-400 text-xs">Sem dados ainda.</li>';
+            } else {
+                listaRank.innerHTML = ranking.map(([id, qtd], i) => {
+                    const loja = dados.lojas.find(l => l.id === id);
+                    const nome = loja ? loja.nome_fantasia : 'Loja (Excluída)';
+                    return `<li class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-bold text-gray-700 text-xs">${i+1}. ${nome}</span><span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${qtd} clicks</span></li>`;
+                }).join('');
+            }
         }
 
         function renderChart(id,type,lbl,dat,cor,tit) {
@@ -273,26 +271,18 @@
         function preencherPrecos(){ if(dados.precos.length){ document.getElementById('price_pro').value=getPreco('plano_pro'); document.getElementById('price_7d').value=getPreco('banner_7d'); document.getElementById('price_14d').value=getPreco('banner_14d'); document.getElementById('price_30d').value=getPreco('banner_30d'); } }
         async function salvarPrecos() { const u=[{chave:'plano_pro',valor:document.getElementById('price_pro').value},{chave:'banner_7d',valor:document.getElementById('price_7d').value},{chave:'banner_14d',valor:document.getElementById('price_14d').value},{chave:'banner_30d',valor:document.getElementById('price_30d').value}]; for(const x of u) await client.from('precos').upsert(x); alert('Preços Salvos!'); carregarDados(); }
         
-        // --- PROMOÇÃO FLEXÍVEL (CÁLCULO AUTOMÁTICO) ---
         async function salvarPromo() {
             const percent = parseFloat(document.getElementById('promo_porcentagem').value) || 0;
             const titulo = document.getElementById('promo_titulo').value || 'Promoção';
-            
-            // 1. Calcula o Preço
             const precoBase = parseFloat(document.getElementById('price_pro').value);
             let novoPreco = precoBase - (precoBase * (percent / 100));
             if(novoPreco < 0) novoPreco = 0;
-
-            // 2. Define o Rótulo Automático
             let rotulo = percent >= 100 ? 'GRÁTIS' : `${percent}% OFF`;
-
-            // 3. Salva Tudo
             await client.from('config').upsert({chave:'promo_titulo', valor_texto: titulo});
             await client.from('config').upsert({chave:'promo_rotulo', valor_texto: rotulo});
             await client.from('config').upsert({chave:'promo_porcentagem', valor_texto: percent.toString()});
-            await client.from('precos').upsert({chave:'promo_preco', valor: novoPreco}); // Salva o valor calculado
-
-            alert(`Configurado!\nDesconto: ${percent}%\nNovo Preço: R$ ${novoPreco.toFixed(2)}\nRótulo: ${rotulo}`);
+            await client.from('precos').upsert({chave:'promo_preco', valor: novoPreco});
+            alert(`Configurado!\nDesconto: ${percent}%\nNovo Preço: R$ ${novoPreco.toFixed(2)}`);
         }
 
         function renderBtnUpsell(){ const b=document.getElementById('btnUpsell'); if(upsellAtivo){b.innerText="ATIVADO";b.className="bg-green-500 text-white px-4 py-2 rounded text-xs font-bold shadow";}else{b.innerText="DESATIVADO";b.className="bg-red-500 text-white px-4 py-2 rounded text-xs font-bold shadow";} }
@@ -307,6 +297,7 @@
     </script>
 </body>
 </html>
-   
 
     
+
+       
